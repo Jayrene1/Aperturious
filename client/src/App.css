@@ -1,3 +1,77 @@
-.App {
-  text-align: center;
+/* Global styles */
+#root {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Header Styles */
+.brand-logo {
+  max-height: 64px;
+  transition: 0.8s;
+}
+
+.brand-logo:hover {
+  transform: rotate(360deg) scale(1.2);
+}
+
+/* Utility classes */
+.h-100 {
+  min-height: 100vh;
+}
+
+.h-33 {
+  min-height: 33.3vh;
+}
+
+.blue-accent {
+  color: #2f4395 !important;
+}
+
+.blue-bg {
+  background-color: #2f4395 !important;
+}
+
+
+.gold-accent {
+  color: #d5b34b !important;
+}
+
+.gold-bg {
+  background-color: #d5b34b !important;
+}
+
+
+.my-1 {
+  margin: 1rem 0 1rem 0;
+}
+
+.my-2 {
+  margin: 2rem 0 2rem 0;
+}
+
+.py-1 {
+  padding: 1rem 0 1rem 0;
+}
+
+.py-2 {
+  padding: 2rem 0 2rem 0;
+}
+
+/* Footer Styles */
+.footer-copyright > .container > a {
+  font-size: 1.25rem;
+  transition: 0.3s;
+}
+
+.footer-copyright > .container > a:hover {
+  transform: scale(1.3);
 }

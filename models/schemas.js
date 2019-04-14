@@ -1,21 +1,23 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+// TODO consider comboning photographer schema into user schema and discerning differences on firebase end
 const photographerSchema = new Schema({
   uuid: { type: String, required: true },
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
-  collections: [{
-      type: Schema.Types.ObjectId,
-      ref: 'Collection' // array associates collections with photographers
-  }],
-  phone: { type: String, required: true },
-  email: { type: String, required: true }
 });
 
 const userSchema = new Schema({
-  uuid: { type: String, required: true },
+  uid: { type: String, required: true },
+  photographer: { type: Boolean, default: false },
   username: { type: String, required: true },
+  email: { type: String, required: true },
+  firstName: String,
+  lastName: String,
+  phone: String,
+  collections: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Collection' // array associates collections with photographers
+  }],
   hearts: [{
       type: Schema.Types.ObjectId,
       ref: 'Photo' // array associates liked photos with users
