@@ -44,7 +44,7 @@ class App extends Component {
             <Route exact path="/register" component={Register} />
             <Route exact path="/collections" component={Collections} />
             <Route path="/collections/:id" component={Collections} />
-            <Route exact path="/create" component={Create} />
+            <Route exact path="/create" component={(props) => <Create {...props} uid={this.state.uid}/>} />
             <Route exact path="/client" component={Client} />
             <Route path="/client/:id" component={Client} />
             <Route exact path="/contact" render={Contact} />

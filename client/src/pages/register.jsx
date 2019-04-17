@@ -55,7 +55,9 @@ class Register extends Component {
         }
 
         axios.post("api/users", userData)
-          .then(() => console.log("User Created!"))
+          .then(() => {
+            this.props.history.push('/create');
+          })
           .catch(err => console.log(err));
       })
       .catch(err => console.log(err));
@@ -65,7 +67,10 @@ class Register extends Component {
     event.preventDefault();
     firebase.auth()
       .signInWithEmailAndPassword(this.state._email, this.state._password)
-        .then(user => console.log("Signed in!"))
+        .then(user => {
+          console.log("SIGNED IN");
+          this.props.history.push('/create');
+        })
         .catch(err => console.log(err));
     };
 

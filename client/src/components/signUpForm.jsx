@@ -38,14 +38,14 @@ function SignIn(props) {
             <div className="row">
                 <div className="input-field col s12">
                     <input id="_email" type="email" name="_email" value={props._email} onChange={props.handleChange} />
-                    <label htmlFor="_email">email</label>
+                    <label htmlFor="_email">Email</label>
                 </div>
                 <div className="input-field col s12">
                     <input id="_password" type="password" name="_password" value={props._password} onChange={props.handleChange} />
                     <label htmlFor="_password">Password</label>
                 </div>
                 <div className="input-field col s12 center">
-                    <button className="waves-effect btn blue-bg">Sign In</button>
+                    <button className="waves-effect btn blue-bg" onClick={props.handleSubmit}>Sign In</button>
                 </div>
             </div>
         </form>
