@@ -7,9 +7,9 @@ import Collections from "./pages/collections";
 import Create from "./pages/create";
 import Client from "./pages/client";
 import Contact from "./pages/contact";
-import { FirebaseContext } from "./components/Firebase";
 import "./App.css";
 
+import firebase from "./firebase";
 
 // data: track auth state?? or do it in wrapper? or firebase will track outside of react?? check here for passing auth props to routes https://tylermcginnis.com/react-router-pass-props-to-components/
 // html: none
@@ -20,6 +20,7 @@ class App extends Component {
     uid: '',
     data: []
   }
+  
   componentDidMount(){
     firebase.auth().onAuthStateChanged(user=> {
       if(user){
@@ -30,12 +31,11 @@ class App extends Component {
       } else {
         console.log('user is not signed in');
       } 
-    })
+    });
   }
 
   render() {
     return (
-      <FirebaseContext.Consumer>
       <Router>
         <Wrapper>
           <Switch>
@@ -51,7 +51,6 @@ class App extends Component {
           </Switch>
         </Wrapper>
       </Router>
-      </FirebaseContext.Consumer>
     );
   }
 }

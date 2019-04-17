@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { SignIn, SignUp } from "../components/signUpForm";
 import axios from "axios";
+import firebase from "../firebase";
 
 /* data: 
     - functions for firebase sign in and uuid storage into database
