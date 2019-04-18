@@ -7,6 +7,7 @@ import Collections from "./pages/collections";
 import Create from "./pages/create";
 import Client from "./pages/client";
 import Contact from "./pages/contact";
+import axios from "axios";
 import "./App.css";
 
 import firebase from "./firebase";
@@ -25,9 +26,15 @@ class App extends Component {
     firebase.auth().onAuthStateChanged(user=> {
       if(user){
         console.log(user);
-        this.setState({
-          uid: user.uid
-        })
+        axios.get(`/api/users/uid/${user.uid}`)
+          .then(res => {
+            console.log(res);
+            this.setState({
+              uid: user.uid,
+              _id: res.data._id
+            });
+          })
+          .catch(err => console.log(err));
       } else {
         console.log('user is not signed in');
       } 
@@ -44,7 +51,7 @@ class App extends Component {
             <Route exact path="/register" component={Register} />
             <Route exact path="/collections" component={Collections} />
             <Route path="/collections/:id" component={Collections} />
-            <Route exact path="/create" component={(props) => <Create {...props} uid={this.state.uid}/>} />
+            <Route exact path="/create" component={(props) => <Create {...props} uid={this.state.uid} _id={this.state._id}/>} />
             <Route exact path="/client" component={Client} />
             <Route path="/client/:id" component={Client} />
             <Route exact path="/contact" render={Contact} />
