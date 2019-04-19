@@ -28,7 +28,7 @@ const collectionSchema = new Schema({
   }],
   password: { type: String, select: false }, // password will not return in a query unless select: false is overriden
   photographer: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "User"
   }
 });
@@ -42,11 +42,10 @@ const photoSchema = new Schema({
   downloads: Number
 });
 
-const Photographer = mongoose.model("Photographer", photographerSchema);
 const User = mongoose.model("User", userSchema);
 const Collection = mongoose.model("Collection", collectionSchema);
 const Photo = mongoose.model("Photo", photoSchema);
 
 module.exports = {
-  Photographer, User, Collection, Photo
+  User, Collection, Photo
 };

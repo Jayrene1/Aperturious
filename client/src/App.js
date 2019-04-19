@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Home from "./pages/home/index";
 import Register from "./pages/register";
 import Collections from "./pages/collections";
+import SingleCollection from "./pages/singleCollection";
 import Create from "./pages/create";
 import Client from "./pages/client";
 import Contact from "./pages/contact";
@@ -18,8 +19,8 @@ import firebase from "./firebase";
 
 class App extends Component {
   state = {
-    uid: '',
-    data: []
+    uid: '', // id of user in FIREBASE
+    data: [] // id of user in MONGO
   }
   
   componentDidMount(){
@@ -50,7 +51,7 @@ class App extends Component {
             <Route exact path="/home" component={Home} />
             <Route exact path="/register" component={Register} />
             <Route exact path="/collections" component={Collections} />
-            <Route path="/collections/:id" component={Collections} />
+            <Route path="/collections/:id" component={SingleCollection} />
             <Route exact path="/create" component={(props) => <Create {...props} uid={this.state.uid} _id={this.state._id}/>} />
             <Route exact path="/client" component={Client} />
             <Route path="/client/:id" component={Client} />

@@ -1,5 +1,7 @@
 import React, { Component, Fragment } from "react";
 import CollectionForm from "../components/collectionForm";
+import CollectionPreview from "../components/collectionPreview";
+import { Link } from "react-router-dom";
 import axios from "axios";
 
 /* data:
@@ -15,16 +17,29 @@ import axios from "axios";
 
 class Create extends Component {
     state = {
+        collectionPreviews: [],
         name: "",
         private: false,
         password: ""
     }
 
     componentDidMount() {
-        console.log(`uid: ${this.props.uid}`);
-        console.log(`_id: ${this.props._id}`);
+        //console.log(`uid: ${this.props.uid}`);
+        //console.log(`_id: ${this.props._id}`);
         const elems = document.querySelectorAll('.modal');
         window.M.Modal.init(elems);
+        if (this.props._id) {
+            this.populateCollections();
+        }
+    }
+
+    populateCollections() {
+        axios.get(`/api/users/${this.props._id}?populate=true`)
+            .then(res => {
+                console.log(res);
+                this.setState({collectionPreviews: res.data.collections});
+            })
+            .catch(err => console.log(err));
     }
 
     openCollectionForm = (event) => {
@@ -52,7 +67,7 @@ class Create extends Component {
             collectionData.password = this.state.password;
         }
 
-        axios.post("api/collections", collectionData)
+        axios.put(`/api/users/${this.props._id}?newCollection=true`, collectionData)
         .then((res) => {
             console.log(res);
             this.setState({
@@ -60,6 +75,7 @@ class Create extends Component {
                 private: false,
                 password: ""
             });
+            this.populateCollections();
         })
         .catch(err => console.log(err));
     }
@@ -71,6 +87,29 @@ class Create extends Component {
                 <div className="row">
                     <div className="col s12 center my-2">
                         <a className="waves-effect btn modal-trigger" href="#collection-form" onClick={this.openCollectionForm}>Create Collection</a>
+                    </div>
+                </div>
+                <div className="divider" />
+                <div className="row">
+                    <div className="gallery">
+                        {this.state.collectionPreviews ? (
+                            this.state.collectionPreviews.map((collection, index) => 
+                                <Link to={`/collections/${collection._id}`}>
+                                    <div className="col s12 m4 l3" key={index}>
+                                        <CollectionPreview 
+                                            name={collection.name} 
+                                            photographer={collection.photographer} 
+                                            photos={collection.photos} 
+                                            privateBoolean={collection.private}
+                                        />
+                                    </div>
+                                </Link>
+                            )
+                        ) : (
+                            <div className="col s12 m6 col-offset-m3 center my-2">
+                                <h5>You have no collections yet...</h5>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
