@@ -35,6 +35,7 @@ module.exports = {
         .create(req.body)
         .then(dbPhoto => {
           db.Collection.findByIdAndUpdate(req.params.id, {$push: {photos: dbPhoto._id}}, {new: true})
+            .populate("photos")
             .then(dbModel => res.json(dbModel))
             .catch(err => res.status(422).json(err));
         })

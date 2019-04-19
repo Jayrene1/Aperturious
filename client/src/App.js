@@ -26,10 +26,9 @@ class App extends Component {
   componentDidMount(){
     firebase.auth().onAuthStateChanged(user=> {
       if(user){
-        console.log(user);
+        console.log(`User Signed In with ${user.email}`);
         axios.get(`/api/users/uid/${user.uid}`)
           .then(res => {
-            console.log(res);
             this.setState({
               uid: user.uid,
               _id: res.data._id
