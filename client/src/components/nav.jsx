@@ -7,7 +7,7 @@ function Nav() {
       <header>
         <nav>
           <div className="nav-wrapper grey darken-5">
-            <Link to="/"><img className="brand-logo" src="assets/images/ap-logo-128.svg" alt="small aperturious logo" viewBox="0px -100 50px 200"/></Link>
+            <Link to="/"><img className="brand-logo" src={require("../images/ap-logo-128.svg")} alt="small aperturious logo" viewBox="0px -100 50px 200"/></Link>
             <ul className="right">
               <li>
                 <Link to="/collections">Collections</Link>

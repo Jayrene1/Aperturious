@@ -1,11 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-// TODO consider comboning photographer schema into user schema and discerning differences on firebase end
-const photographerSchema = new Schema({
-  uuid: { type: String, required: true },
-});
-
 const userSchema = new Schema({
   uid: { type: String, required: true },
   photographer: { type: Boolean, default: false },
@@ -24,15 +19,18 @@ const userSchema = new Schema({
   }]
 });
 
-
 const collectionSchema = new Schema({
   name: { type: String, required: true },
-  public: { type: Boolean, default: true },
+  private: { type: Boolean, default: false },
   photos: [{
       type: Schema.Types.ObjectId,
       ref: 'Photo' // array associates collections with photos
   }],
-  password: { type: String, select: false } // password will not return in a query unless select: false is overriden
+  password: { type: String, select: false }, // password will not return in a query unless select: false is overriden
+  photographer: {
+    type: Schema.Types.ObjectId,
+    ref: "User"
+  }
 });
 
 const photoSchema = new Schema({
@@ -44,11 +42,10 @@ const photoSchema = new Schema({
   downloads: Number
 });
 
-const Photographer = mongoose.model("Photographer", photographerSchema);
 const User = mongoose.model("User", userSchema);
 const Collection = mongoose.model("Collection", collectionSchema);
 const Photo = mongoose.model("Photo", photoSchema);
 
 module.exports = {
-  Photographer, User, Collection, Photo
+  User, Collection, Photo
 };
