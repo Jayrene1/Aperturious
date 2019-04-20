@@ -1,7 +1,8 @@
 import React, { Component, Fragment } from "react";
+import Nav from "../components/nav";
 import PhotoUpForm from "../components/photoUpForm";
 import axios from "axios";
-import firebase from "../firebase";
+import { collectionPhotosRef } from "../firebase";
 
 /* data: 
   - url id exists, render all collection photos or "this collection is empty, and will expire soon if left unchanged"
@@ -23,10 +24,16 @@ class singleCollection extends Component {
     selectedFiles: []
   }
 
+  componentWillMount() {
+    document.title = "Aperturious - Collection";
+}
+
   componentDidMount() {
     const { match: { params } } = this.props; // THIS IS HOW YOU GET URL PATH VARIABLE
       // initialize materialize modal
       const elems = document.querySelectorAll('.modal');
+      const materialboxed = document.querySelectorAll('.materialboxed');
+      window.M.Materialbox.init(materialboxed);
       window.M.Modal.init(elems);
       this.populatePhotos(params.id);
   }
@@ -54,9 +61,9 @@ class singleCollection extends Component {
     const files = this.state.selectedFiles;
     // loop through each file
     for (let i = 0; i < files.length; i++) {
-      const storageRef = firebase.storage().ref(`collection-photos/${files[i].name}`);
+      const fileRef = collectionPhotosRef.child(`${files[i].name}`);
         // Upload file
-      const photoUploadTask = storageRef.put(files[i]);
+      const photoUploadTask = fileRef.put(files[i]);
 
       photoUploadTask.on("state_changed", snapshot => {
         console.log(snapshot.bytesTransferred / snapshot.totalBytes * 100);
@@ -96,6 +103,7 @@ class singleCollection extends Component {
   render() {
     return (
       <Fragment>
+      <Nav />
       <div className="container">
         <div className="row">
           <div className="col s12 center">
@@ -104,10 +112,10 @@ class singleCollection extends Component {
           </div>
         </div>
         <div className="row">
-          <div className="gallery">
+          <div className="masonry-with-columns">
             {this.state.photos ? (
                 this.state.photos.map((photo, index) => 
-                    <div className="col s12 m4 l3" key={index}>
+                    <div key={index}>
                         <img className="responsive-img" src={photo.lowResURL} alt="collection item" />
                     </div>
                 )

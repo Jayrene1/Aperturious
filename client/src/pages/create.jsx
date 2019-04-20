@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from "react";
+import Nav from "../components/nav";
 import CollectionForm from "../components/collectionForm";
 import CollectionPreview from "../components/collectionPreview";
 import { Link } from "react-router-dom";
@@ -23,9 +24,11 @@ class Create extends Component {
         password: ""
     }
 
+    componentWillMount() {
+        document.title = "Aperturious - Create";
+    }
+
     componentDidMount() {
-        //console.log(`uid: ${this.props.uid}`);
-        //console.log(`_id: ${this.props._id}`);
         const elems = document.querySelectorAll('.modal');
         window.M.Modal.init(elems);
         if (this.props._id) {
@@ -34,17 +37,26 @@ class Create extends Component {
     }
 
     populateCollections() {
-        axios.get(`/api/users/${this.props._id}?populate=true`)
+        axios.get(`/api/users/${this.props._id}?populate=true&photoLimit=3`)
             .then(res => {
-                console.log(res);
                 this.setState({collectionPreviews: res.data.collections});
             })
             .catch(err => console.log(err));
     }
 
-    openCollectionForm = (event) => {
-        event.preventDefault();
-    
+    getPreviewImages = () => {
+        for (let i = 0; i < this.state.collectionPreviews.length; i++) {
+            if (this.state.collectionPreviews[i].photos) {
+                axios.get(`/api/collections/${this.state.collectionPreviews[i]._id}?populate=true&limit=3`)
+                .then(res => {
+                    const photos = res.data.photos;
+                    this.setState({
+                        photoPreviews: [...this.state.photoPreviews, photos]
+                    })
+                })
+                .catch(err => console.log(err));
+            }
+        }
     }
 
     handleChange = event => {
@@ -83,10 +95,11 @@ class Create extends Component {
     render() {
         return (
             <Fragment>
+            <Nav />
             <div className="container">
                 <div className="row">
                     <div className="col s12 center my-2">
-                        <a className="waves-effect btn modal-trigger" href="#collection-form" onClick={this.openCollectionForm}>Create Collection</a>
+                        <a className="waves-effect btn modal-trigger" href="#collection-form">Create Collection</a>
                     </div>
                 </div>
                 <div className="divider" />
@@ -95,8 +108,9 @@ class Create extends Component {
                         {this.state.collectionPreviews ? (
                             this.state.collectionPreviews.map((collection, index) => 
                                 <Link to={`/collections/${collection._id}`}>
-                                    <div className="col s12 m4 l3" key={index}>
-                                        <CollectionPreview 
+                                    <div className="col s12 m6 l4">
+                                        <CollectionPreview
+                                            key={index}
                                             name={collection.name} 
                                             photographer={collection.photographer} 
                                             photos={collection.photos} 

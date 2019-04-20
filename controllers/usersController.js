@@ -9,10 +9,17 @@ module.exports = {
   },
   findById: function(req, res) { //axios.get("/api/users/:id?populate=true")
     const populate = req.query.populate;
+    let photoLimit = Number(req.query.photoLimit);
     if (populate === "true") {
       db.User
       .findById(req.params.id)
-      .populate("collections")
+      .populate({
+        path: "collections",
+        populate: {
+          path: "photos",
+          options: { limit: photoLimit }
+        }
+      })
       .then(dbModel => res.json(dbModel))
       .catch(err => res.status(422).json(err));
     } else {

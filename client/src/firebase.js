@@ -13,4 +13,7 @@ const config = {
 
 firebase.initializeApp(config);
 
-export default firebase;
+const collectionPhotosRef = firebase.storage().ref(`collection-photos/`);
+const profilePhotosRef = firebase.storage().ref('profile-photos/');
+
+export { firebase, collectionPhotosRef, profilePhotosRef };

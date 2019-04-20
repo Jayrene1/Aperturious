@@ -1,4 +1,4 @@
-nav {
+.home-nav {
   position: absolute;
   top: 0;
   background-color: transparent !important;
@@ -6,12 +6,7 @@ nav {
   -webkit-box-shadow: none;
 }
 
-p {
-  font-size: 110%;
-  line-height: 1.7;
-}
-
-.nav-wrapper {
+.home-nav-wrapper {
   background-color: transparent !important;
 }
 

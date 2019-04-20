@@ -1,7 +1,8 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
+import Nav from "../components/nav";
 import { SignIn, SignUp } from "../components/signUpForm";
 import axios from "axios";
-import firebase from "../firebase";
+import { firebase } from "../firebase";
 
 /* data: 
     - functions for firebase sign in and uuid storage into database
@@ -21,6 +22,10 @@ class Register extends Component {
     _email: "", // separate fields for Sign In
     _password: ""
   };
+
+  componentWillMount() {
+    document.title = "Aperturious - Register";
+  }
 
   handleFormSwap = event => {
     event.preventDefault();
@@ -76,7 +81,8 @@ class Register extends Component {
 
   render() {
     return (
-      <React.Fragment>
+      <Fragment>
+        <Nav />
         <div className="container">
           <div className="row">
             <div className="col s12 m8 offset-m2 my-2">
@@ -105,7 +111,7 @@ class Register extends Component {
             </div>
           </div>
         </div>
-      </React.Fragment>
+      </Fragment>
     );
   }
 }

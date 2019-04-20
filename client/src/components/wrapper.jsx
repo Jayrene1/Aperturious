@@ -1,14 +1,14 @@
 import React, { Fragment } from "react";
-import Nav from "./nav";
 import Footer from "./footer";
 
 function Wrapper({ children }) {
     return (
         <Fragment>
-            <Nav/>
-            <main>
-                {children}
-            </main>
+            <div id="root-100">
+                <main>
+                    {children}
+                </main>
+            </div>
             <Footer/>
         </Fragment>
     );

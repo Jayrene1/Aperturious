@@ -9,9 +9,11 @@ module.exports = {
   },
   findById: function(req, res) { //axios.get("/api/collections/:id?populate=true")
     const populate = req.query.populate;
+    let limit = Number(req.query.limit);
+    limit = limit - (limit * 2);
     if (populate === "true") {
       db.Collection
-      .findById(req.params.id)
+      .findById(req.params.id, {photos: {$slice: limit}})
       .populate("photos")
       .then(dbModel => res.json(dbModel))
       .catch(err => res.status(422).json(err));

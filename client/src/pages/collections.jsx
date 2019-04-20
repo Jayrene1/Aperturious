@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from "react";
+import Nav from "../components/nav";
 
 /* data: 
   - url id exists, render all collection photos or "this collection is empty, and will expire soon if left unchanged"
@@ -14,6 +15,11 @@ import React, { Component, Fragment } from "react";
 
 
 class Collections extends Component {
+  
+  componentWillMount() {
+    document.title = "Aperturious - Collections";
+  }
+
   componentDidMount() {
     const { match: { params } } = this.props; // THIS IS HOW YOU GET URL PATH VARIABLE
       console.log(params);
@@ -22,6 +28,7 @@ class Collections extends Component {
   render() {
     return (
       <Fragment>
+        <Nav />
         <h1>Collections</h1>
       </Fragment>
     );

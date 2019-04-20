@@ -1,4 +1,5 @@
 import React, { Fragment } from "react";
+import Nav from "../components/nav";
 
 /* data:
     - if authed:
@@ -15,6 +16,7 @@ import React, { Fragment } from "react";
 function Client() {
     return (
         <Fragment>
+            <Nav />
             <h1>CLIENT</h1>
         </Fragment>
     );

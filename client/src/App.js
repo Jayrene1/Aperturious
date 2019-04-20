@@ -11,7 +11,7 @@ import Contact from "./pages/contact";
 import axios from "axios";
 import "./App.css";
 
-import firebase from "./firebase";
+import { firebase } from "./firebase";
 
 // data: track auth state?? or do it in wrapper? or firebase will track outside of react?? check here for passing auth props to routes https://tylermcginnis.com/react-router-pass-props-to-components/
 // html: none
@@ -46,7 +46,7 @@ class App extends Component {
       <Router>
         <Wrapper>
           <Switch>
-            <Route exact path="/" render={Home} />
+            <Route exact path="/" component={Home} />
             <Route exact path="/home" component={Home} />
             <Route exact path="/register" component={Register} />
             <Route exact path="/collections" component={Collections} />

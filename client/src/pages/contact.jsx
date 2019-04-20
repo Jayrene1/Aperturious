@@ -1,4 +1,5 @@
 import React, { Fragment } from "react";
+import Nav from "../components/nav";
 
 // data: render photographers as individual cards
 /* html: 
@@ -9,6 +10,7 @@ import React, { Fragment } from "react";
 function Contact() {
     return (
         <Fragment>
+            <Nav />
             <h1>CONTACT</h1>
         </Fragment>
     );
