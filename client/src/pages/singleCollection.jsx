@@ -32,8 +32,6 @@ class singleCollection extends Component {
     const { match: { params } } = this.props; // THIS IS HOW YOU GET URL PATH VARIABLE
       // initialize materialize modal
       const elems = document.querySelectorAll('.modal');
-      const materialboxed = document.querySelectorAll('.materialboxed');
-      window.M.Materialbox.init(materialboxed);
       window.M.Modal.init(elems);
       this.populatePhotos(params.id);
   }
@@ -62,6 +60,7 @@ class singleCollection extends Component {
     // loop through each file
     for (let i = 0; i < files.length; i++) {
       const fileRef = collectionPhotosRef.child(`${files[i].name}`);
+      console.log(fileRef);
         // Upload file
       const photoUploadTask = fileRef.put(files[i]);
 
