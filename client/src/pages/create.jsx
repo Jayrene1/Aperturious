@@ -2,8 +2,10 @@ import React, { Component, Fragment } from "react";
 import Nav from "../components/nav";
 import CollectionForm from "../components/collectionForm";
 import CollectionPreview from "../components/collectionPreview";
+import ProfileForm from "../components/profileForm";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { profilePhotosRef } from "../firebase";
 
 /* data:
     - if authed as photographer, render components || if not, show "only photographer accounts can create collections"
@@ -21,7 +23,12 @@ class Create extends Component {
         collectionPreviews: [],
         name: "",
         private: false,
-        password: ""
+        password: "",
+        profilePhoto: "",
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: ""
     }
 
     componentWillMount() {
@@ -39,7 +46,17 @@ class Create extends Component {
     populateCollections() {
         axios.get(`/api/users/${this.props._id}?populate=true&photoLimit=3`)
             .then(res => {
-                this.setState({collectionPreviews: res.data.collections});
+                console.log(res);
+                this.setState({
+                    collectionPreviews: res.data.collections,
+                    profilePhoto: res.data.photoURL,
+                    firstName: res.data.firstName,
+                    lastName: res.data.lastName,
+                    email: res.data.email,
+                    phone: res.data.phone
+                },
+                () => window.M.updateTextFields() // avoids form labels overlapping content in profile form
+                );
             })
             .catch(err => console.log(err));
     }
@@ -66,6 +83,48 @@ class Create extends Component {
         const value = target.type === 'checkbox' ? target.checked : target.value;
         this.setState({ [name]: value });
     };
+
+    fileSelectedHandler = event => {
+        event.preventDefault();
+        // Create a storage reference unique to the user using their UID
+        const fileRef = profilePhotosRef.child(this.props._id);
+        // Upload file
+        const photoUploadTask = fileRef.put(event.target.files[0]);
+
+        photoUploadTask.on("state_changed", snapshot => {
+        console.log(snapshot.bytesTransferred / snapshot.totalBytes * 100);           
+        },
+        error => console.log(`error`, error.message), 
+        () => {
+        photoUploadTask.snapshot.ref.getDownloadURL()
+            .then((url) => {
+                this.storePhotoURL(url);
+            })
+        })  
+    }
+
+    storePhotoURL = url => {
+    // post to mongo
+    axios.put(`/api/users/${this.props._id}`, {photoURL: url})
+        .then(res => this.setState({profilePhoto: res.data.photoURL}))
+        .catch(err => console.log(err.message));
+    }
+
+    handleProfileSubmit = event => {
+        event.preventDefault();
+        let userData = {
+            firstName: this.state.firstName,
+            lastName: this.state.lastName,
+            email: this.state.email,
+            phone: this.state.phone
+        };
+        axios.put(`api/users/${this.props._id}`, userData)
+        .then(res => {
+          console.log(res);
+        })
+        .catch(err => console.log(err));
+
+    }
 
     handleCreateCollection = event => {
         event.preventDefault();
@@ -97,6 +156,23 @@ class Create extends Component {
             <Fragment>
             <Nav />
             <div className="container">
+                <div className="row my-2">
+                    <div className="col s12 m6 offset-m3 center">
+                        <img className="circle profile-photo" src={this.state.profilePhoto || require("../images/user-placeholder.jpg")} alt="user-profile"/>
+                    </div>
+                    <div className="col s12">
+                        <ProfileForm 
+                            firstName={this.state.firstName} 
+                            lastName={this.state.lastName}
+                            email={this.state.email}
+                            phone={this.state.phone}
+                            fileSelectedHandler={this.fileSelectedHandler}
+                            handleChange={this.handleChange}
+                            handleSubmit={this.handleProfileSubmit}
+                            />
+                    </div>
+                </div>
+                <div className="divider" />
                 <div className="row">
                     <div className="col s12 center my-2">
                         <a className="waves-effect btn modal-trigger" href="#collection-form">Create Collection</a>

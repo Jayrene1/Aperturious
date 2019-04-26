@@ -6,6 +6,7 @@ const userSchema = new Schema({
   photographer: { type: Boolean, default: false },
   username: { type: String, required: true },
   email: { type: String, required: true },
+  photoURL: String,
   firstName: String,
   lastName: String,
   phone: String,

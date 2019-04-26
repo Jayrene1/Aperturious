@@ -74,6 +74,14 @@ h1, h2, h3, h4, h5, h6, p {
   padding: 2rem 0 2rem 0;
 }
 
+/* Profile styles */
+
+.profile-photo {
+  object-fit: cover;
+  width: 350px;
+  height: 350px;
+}
+
 /* Gallery Styles */
 
 .gallery > a {
