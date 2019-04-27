@@ -2,10 +2,25 @@ const db = require("../models/schemas");
 
 module.exports = {
   findAll: function(req, res) {
-    db.Collection
-      .find(req.query)
+    let limit = Number(req.query.limit);
+    let offset = Number(req.query.offset);
+    if (req.query.previews === "true") {
+      db.Collection
+      .find({}, {photos: {$slice: 3}})
+      .skip(offset)
+      .limit(limit)
+      .populate("photos")
+      .populate("photographer", "username photoURL")
       .then(dbModel => res.json(dbModel))
       .catch(err => res.status(422).json(err));
+    } else {
+    db.Collection
+      .find()
+      .skip(offset)
+      .limit(limit)
+      .then(dbModel => res.json(dbModel))
+      .catch(err => res.status(422).json(err));
+    }
   },
   findById: function(req, res) { //axios.get("/api/collections/:id?populate=true")
     const populate = req.query.populate;

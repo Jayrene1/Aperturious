@@ -12,7 +12,7 @@ function PhotoUpForm(props) {
                         <div className="file-field input-field">
                             <div className="btn">
                                 <span>Browse</span>
-                                <input type="file" multiple onChange={props.fileSelectedHandler} required/>
+                                <input type="file" accept=".jpg,.png" multiple onChange={props.fileSelectedHandler} required/>
                             </div>
                             
                             <div className="file-path-wrapper">

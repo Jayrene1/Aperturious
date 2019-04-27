@@ -7,6 +7,7 @@ const userSchema = new Schema({
   username: { type: String, required: true },
   email: { type: String, required: true },
   photoURL: String,
+  thumbnailURL: String,
   firstName: String,
   lastName: String,
   phone: String,
@@ -32,12 +33,15 @@ const collectionSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "User"
   }
+},
+{
+  timestamps: true
 });
 
 const photoSchema = new Schema({
   highResURL: String,
-  mediumResURL: String,
   lowResURL: { type: String, required: true },
+  thumbnailURL: String,
   tags: [String],
   hearts: Number,
   downloads: Number

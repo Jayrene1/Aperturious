@@ -19,194 +19,203 @@ import { profilePhotosRef } from "../firebase";
 */
 
 class Create extends Component {
-    state = {
-        collectionPreviews: [],
-        name: "",
-        private: false,
-        password: "",
-        profilePhoto: "",
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: ""
-    }
+  state = {
+    collectionPreviews: [],
+    name: "",
+    private: false,
+    password: "",
+    profilePhoto: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: ""
+  };
 
-    componentWillMount() {
-        document.title = "Aperturious - Create";
-    }
+  componentWillMount() {
+    document.title = "Aperturious - Create";
+  }
 
-    componentDidMount() {
-        const elems = document.querySelectorAll('.modal');
-        window.M.Modal.init(elems);
-        if (this.props._id) {
-            this.populateCollections();
-        }
+  componentDidMount() {
+    const elems = document.querySelectorAll(".modal");
+    window.M.Modal.init(elems);
+    if (this.props._id) {
+      this.populateCollections();
     }
+  }
 
-    populateCollections() {
-        axios.get(`/api/users/${this.props._id}?populate=true&photoLimit=3`)
-            .then(res => {
-                console.log(res);
-                this.setState({
-                    collectionPreviews: res.data.collections,
-                    profilePhoto: res.data.photoURL,
-                    firstName: res.data.firstName,
-                    lastName: res.data.lastName,
-                    email: res.data.email,
-                    phone: res.data.phone
-                },
-                () => window.M.updateTextFields() // avoids form labels overlapping content in profile form
-                );
-            })
-            .catch(err => console.log(err));
-    }
+  populateCollections() {
+    axios
+      .get(`/api/users/${this.props._id}?populate=true&photoLimit=3`)
+      .then(res => {
+        console.log(res);
+        this.setState(
+          {
+            collectionPreviews: res.data.collections,
+            profilePhoto: res.data.photoURL,
+            firstName: res.data.firstName,
+            lastName: res.data.lastName,
+            email: res.data.email,
+            phone: res.data.phone
+          },
+          () => window.M.updateTextFields() // avoids form labels overlapping content in profile form
+        );
+      })
+      .catch(err => console.log(err));
+  }
 
-    getPreviewImages = () => {
-        for (let i = 0; i < this.state.collectionPreviews.length; i++) {
-            if (this.state.collectionPreviews[i].photos) {
-                axios.get(`/api/collections/${this.state.collectionPreviews[i]._id}?populate=true&limit=3`)
-                .then(res => {
-                    const photos = res.data.photos;
-                    this.setState({
-                        photoPreviews: [...this.state.photoPreviews, photos]
-                    })
-                })
-                .catch(err => console.log(err));
-            }
-        }
-    }
+  handleChange = event => {
+    event.preventDefault();
+    const target = event.target;
+    const name = target.name;
+    const value = target.type === "checkbox" ? target.checked : target.value;
+    this.setState({ [name]: value });
+  };
 
-    handleChange = event => {
-        event.preventDefault();
-        const target = event.target;
-        const name = target.name;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
-        this.setState({ [name]: value });
+  fileSelectedHandler = event => {
+    event.preventDefault();
+    // Create a storage reference unique to the user using their UID
+    const fileRef = profilePhotosRef.child(this.props._id);
+    // Upload file
+    const photoUploadTask = fileRef.put(event.target.files[0]);
+
+    photoUploadTask.on(
+      "state_changed",
+      snapshot => {
+        console.log((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+      },
+      error => console.log(`error`, error.message),
+      () => {
+        photoUploadTask.snapshot.ref.getDownloadURL().then(url => {
+          this.storePhotoURL(url);
+        });
+      }
+    );
+  };
+
+  storePhotoURL = url => {
+    // post to mongo
+    axios
+      .put(`/api/users/${this.props._id}`, { photoURL: url })
+      .then(res => this.setState({ profilePhoto: res.data.photoURL }))
+      .catch(err => console.log(err.message));
+  };
+
+  handleProfileSubmit = event => {
+    event.preventDefault();
+    let userData = {
+      firstName: this.state.firstName,
+      lastName: this.state.lastName,
+      email: this.state.email,
+      phone: this.state.phone
+    };
+    axios
+      .put(`api/users/${this.props._id}`, userData)
+      .then(res => {
+        console.log(res);
+      })
+      .catch(err => console.log(err));
+  };
+
+  handleCreateCollection = event => {
+    event.preventDefault();
+    let collectionData = {
+      name: this.state.name,
+      private: this.state.private,
+      photographer: this.props._id
     };
 
-    fileSelectedHandler = event => {
-        event.preventDefault();
-        // Create a storage reference unique to the user using their UID
-        const fileRef = profilePhotosRef.child(this.props._id);
-        // Upload file
-        const photoUploadTask = fileRef.put(event.target.files[0]);
-
-        photoUploadTask.on("state_changed", snapshot => {
-        console.log(snapshot.bytesTransferred / snapshot.totalBytes * 100);           
-        },
-        error => console.log(`error`, error.message), 
-        () => {
-        photoUploadTask.snapshot.ref.getDownloadURL()
-            .then((url) => {
-                this.storePhotoURL(url);
-            })
-        })  
+    if (this.state.private) {
+      collectionData.password = this.state.password;
     }
 
-    storePhotoURL = url => {
-    // post to mongo
-    axios.put(`/api/users/${this.props._id}`, {photoURL: url})
-        .then(res => this.setState({profilePhoto: res.data.photoURL}))
-        .catch(err => console.log(err.message));
-    }
+    axios
+      .put(`/api/users/${this.props._id}?newCollection=true`, collectionData)
+      .then(res => {
+        console.log(res);
+        this.setState({
+          name: "",
+          private: false,
+          password: ""
+        });
+        this.populateCollections();
+      })
+      .catch(err => console.log(err));
+  };
 
-    handleProfileSubmit = event => {
-        event.preventDefault();
-        let userData = {
-            firstName: this.state.firstName,
-            lastName: this.state.lastName,
-            email: this.state.email,
-            phone: this.state.phone
-        };
-        axios.put(`api/users/${this.props._id}`, userData)
-        .then(res => {
-          console.log(res);
-        })
-        .catch(err => console.log(err));
-
-    }
-
-    handleCreateCollection = event => {
-        event.preventDefault();
-        let collectionData = {
-            name: this.state.name,
-            private: this.state.private,
-            photographer: this.props._id
-        };
-
-        if (this.state.private) {
-            collectionData.password = this.state.password;
-        }
-
-        axios.put(`/api/users/${this.props._id}?newCollection=true`, collectionData)
-        .then((res) => {
-            console.log(res);
-            this.setState({
-                name: "",
-                private: false,
-                password: ""
-            });
-            this.populateCollections();
-        })
-        .catch(err => console.log(err));
-    }
-    
-    render() {
-        return (
-            <Fragment>
-            <Nav />
-            <div className="container">
-                <div className="row my-2">
-                    <div className="col s12 m6 offset-m3 center">
-                        <img className="circle profile-photo" src={this.state.profilePhoto || require("../images/user-placeholder.jpg")} alt="user-profile"/>
-                    </div>
-                    <div className="col s12">
-                        <ProfileForm 
-                            firstName={this.state.firstName} 
-                            lastName={this.state.lastName}
-                            email={this.state.email}
-                            phone={this.state.phone}
-                            fileSelectedHandler={this.fileSelectedHandler}
-                            handleChange={this.handleChange}
-                            handleSubmit={this.handleProfileSubmit}
-                            />
-                    </div>
-                </div>
-                <div className="divider" />
-                <div className="row">
-                    <div className="col s12 center my-2">
-                        <a className="waves-effect btn modal-trigger" href="#collection-form">Create Collection</a>
-                    </div>
-                </div>
-                <div className="divider" />
-                <div className="row">
-                    <div className="gallery">
-                        {this.state.collectionPreviews ? (
-                            this.state.collectionPreviews.map((collection, index) => 
-                                <Link to={`/collections/${collection._id}`}>
-                                    <div className="col s12 m6 l4">
-                                        <CollectionPreview
-                                            key={index}
-                                            name={collection.name} 
-                                            photographer={collection.photographer} 
-                                            photos={collection.photos} 
-                                            privateBoolean={collection.private}
-                                        />
-                                    </div>
-                                </Link>
-                            )
-                        ) : (
-                            <div className="col s12 m6 col-offset-m3 center my-2">
-                                <h5>You have no collections yet...</h5>
-                            </div>
-                        )}
-                    </div>
-                </div>
+  render() {
+    return (
+      <Fragment>
+        <Nav />
+        <div className="container">
+          <div className="row my-2">
+            <div className="col s12 m6 offset-m3 center">
+              <img
+                className="circle profile-photo"
+                src={
+                  this.state.profilePhoto ||
+                  require("../images/user-placeholder.jpg")
+                }
+                alt="user-profile"
+              />
             </div>
-            <CollectionForm name={this.state.name} private={this.state.private} password={this.state.password} handleChange={this.handleChange} handleCreateCollection={this.handleCreateCollection} />
-            </Fragment>
-        );    
-    }
+            <div className="col s12">
+              <ProfileForm
+                firstName={this.state.firstName}
+                lastName={this.state.lastName}
+                email={this.state.email}
+                phone={this.state.phone}
+                fileSelectedHandler={this.fileSelectedHandler}
+                handleChange={this.handleChange}
+                handleSubmit={this.handleProfileSubmit}
+              />
+            </div>
+          </div>
+          <div className="divider" />
+          <div className="row">
+            <div className="col s12 center my-2">
+              <a
+                className="waves-effect btn modal-trigger"
+                href="#collection-form"
+              >
+                Create Collection
+              </a>
+            </div>
+          </div>
+          <div className="divider" />
+          <div className="row">
+            <div className="gallery">
+              {this.state.collectionPreviews ? (
+                this.state.collectionPreviews.map((collection, index) => (
+                  <Link to={`/collections/${collection._id}`}>
+                    <div className="col s12 m6 l4">
+                      <CollectionPreview
+                        key={index}
+                        name={collection.name}
+                        photographer={collection.photographer}
+                        photos={collection.photos}
+                        privateBoolean={collection.private}
+                      />
+                    </div>
+                  </Link>
+                ))
+              ) : (
+                <div className="col s12 m6 col-offset-m3 center my-2">
+                  <h5>You have no collections yet...</h5>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        <CollectionForm
+          name={this.state.name}
+          private={this.state.private}
+          password={this.state.password}
+          handleChange={this.handleChange}
+          handleCreateCollection={this.handleCreateCollection}
+        />
+      </Fragment>
+    );
+  }
 }
 
 export default Create;
