@@ -1,8 +1,12 @@
 import React, { Component, Fragment } from "react";
 import Nav from "../components/nav";
-import PhotoUpForm from "../components/photoUpForm";
+import Uppy from "@uppy/core";
+import ThumbnailGenerator from "@uppy/thumbnail-generator";
+import { UppyPhotoFormButton } from "../components/uppy";
 import axios from "axios";
 import { collectionPhotosRef } from "../firebase";
+import '@uppy/core/dist/style.min.css'
+import '@uppy/dashboard/dist/style.min.css'
 
 /* data: 
   - url id exists, render all collection photos or "this collection is empty, and will expire soon if left unchanged"
@@ -21,23 +25,41 @@ class singleCollection extends Component {
   state = {
     photos: [],
     name: "",
-    selectedFiles: []
+    selectedFiles: [],
+    uppy: Uppy({
+      meta: { type: "avatar" },
+      autoProceed: false,
+      closeAfterFinish: true,
+      restrictions: {
+        allowedFileTypes: [".jpg", ".jpeg", ".png",]
+      }
+    })
   }
 
   componentWillMount() {
     document.title = "Aperturious - Collection";
-}
+  }
 
   componentDidMount() {
     const { match: { params } } = this.props; // THIS IS HOW YOU GET URL PATH VARIABLE
       // initialize materialize modal
       const elems = document.querySelectorAll('.modal');
       window.M.Modal.init(elems);
+      // show all photos in collection
       this.populatePhotos(params.id);
+      // configure uppy to generate thumbnail versions of photo uploads
+      this.state.uppy.use(ThumbnailGenerator, {
+        id: "ThumbnailGenerator",
+        thumbnailWidth: 450,
+      });
+      // attach listener for upload button click - will upload to firebase
+      this.uppyUploadListener(params.id);
+      // attach listener for thumbnail generation - will upload to firebase
+        this.uppyThumbnailListener();
   }
 
-  populatePhotos(id) {
-    axios.get(`/api/collections/${id}?populate=true`)
+  populatePhotos(collectionID) {
+    axios.get(`/api/collections/${collectionID}?populate=true`)
         .then(res => {
             this.setState({
               photos: res.data.photos,
@@ -47,52 +69,97 @@ class singleCollection extends Component {
         .catch(err => console.log(err));
   }
 
-  fileSelectedHandler = event => {
-    this.setState({selectedFiles: event.target.files});
-    console.log(event.target.files);
+  uppyThumbnailListener = () => {
+    this.state.uppy.on("thumbnail:generated", (a, b) => {
+      console.log(a);
+      console.log(b);
+    })
   }
 
-  fileUploadHandler = event => {
-    event.preventDefault();
+  uppyUploadListener(collectionID) {
+    const uppy = this.state.uppy;
 
-    // Create a storage reference unique to the user using their UID
-    const files = this.state.selectedFiles;
-    // loop through each file
-    for (let i = 0; i < files.length; i++) {
-      const fileRef = collectionPhotosRef.child(`${files[i].name}`);
-      console.log(fileRef);
-        // Upload file
-      const photoUploadTask = fileRef.put(files[i]);
+    uppy.on("upload", data => {
+      console.log(data);
+      data.fileIDs.map(id => {
+        return new Promise((resolve, reject) => {
+          const file = uppy.getFile(id);
+          const collectionRef = collectionPhotosRef.child(collectionID);
+          const hash = Math.random().toString(36).substring(2, 15);
+          const fileRef = collectionRef.child(hash);
+          const metaData = {
+            contentType: file.type
+          };
+          let highResURL = ""; // cache firebase url when photo is stored
 
-      photoUploadTask.on("state_changed", snapshot => {
-        console.log(snapshot.bytesTransferred / snapshot.totalBytes * 100);
-          
-          /*let percentage = snapshot.bytesTransferred / snapshot.totalBytes * 100
-          if (percentage < 10){
-            progressBar.style.width = `10%`;
-            progressBar.innerHTML = `${percentage.toFixed(0)}%`;
-          } else {
-            progressBar.style.width = `${percentage}%`;
-            progressBar.innerHTML = `${percentage.toFixed(0)}%`;
-          }*/
+          uppy.emit("upload-started", file);
+          const uploadTask = fileRef.put(file.data, metaData);
+          uploadTask.on(
+            "state_changed",
+            snapshot => {
+              const progressInfo = {
+                uploader: this,
+                bytesUploaded: snapshot.bytesTransferred,
+                bytesTotal: snapshot.totalBytes
+              };
+              uppy.emit("upload-progress", file, progressInfo);
+            },
+            error => {
+              uppy.emit("upload-error", file, error);
+              reject(error);
+            },
+            () => {
+              uploadTask.snapshot.ref.getDownloadURL().then(downloadUrl => {
+                const file = uppy.getFile(id);
+                file.downloadUrl = downloadUrl;
+                highResURL = downloadUrl; // set firebase downloadURL for storing later
+                this.uploadThumbnail(hash, collectionRef, file, highResURL);
+                uppy.emit(
+                  "upload-success",
+                  file,
+                  uploadTask.snapshot,
+                  downloadUrl
+                );
+                resolve();
+              });
+            }
+          );
+        });        
+      })
+    });    
+  }  
+
+  uploadThumbnail = (hash, collectionRef, file, highResURL) => {
+    // upload thumbnail
+    axios({
+      method: "get",
+      url: file.preview,
+      responseType: "blob"
+    }).then(res => {
+      const thumbFileRef = collectionRef.child(`@thumb${hash}`);
+      const thumbUploadTask = thumbFileRef.put(res.data);
+      thumbUploadTask.on(
+        "state_changed",
+        snapshot => {console.log("uploading thumb")},
+        error => {
+          console.log("Error uploading thumbnail");
         },
-      error => console.log(`error`, error.message), 
-      () => {
-        photoUploadTask.snapshot.ref.getDownloadURL()
-          .then((url) => {
-            console.log(url);
-            this.storePhotoURL(url);
-            /*setTimeout(() => {
-              progressBar.style.width = `0%`
-            }, 1000)*/
-          })
-      })  
-    }
+        () => {
+          thumbUploadTask.snapshot.ref.getDownloadURL().then(thumbnailURL => {
+            this.storePhotoURL(highResURL, thumbnailURL);
+          });
+        }
+      );
+    });    
   }
 
-  storePhotoURL = url => {
+  storePhotoURL = (lowResURL, thumbnailURL) => {
     // post to mongo, defaulting now to lowResURL
-    axios.put(`/api/collections/${this.props.match.params.id}?newPhoto=true`, {lowResURL: url})
+    const photoData = {
+      lowResURL: lowResURL,
+      thumbnailURL: thumbnailURL
+    };
+    axios.put(`/api/collections/${this.props.match.params.id}?newPhoto=true`, photoData)
       .then(res => { console.log(res.data);
         this.setState({photos: res.data.photos})
       })
@@ -107,7 +174,7 @@ class singleCollection extends Component {
         <div className="row">
           <div className="col s12 center">
             <h5>{this.state.name}</h5>
-            <a className="waves-effect btn modal-trigger" href="#photo-form">Upload Photo</a>
+            <UppyPhotoFormButton uppy={this.state.uppy} />
           </div>
         </div>
         <div className="row">
@@ -125,10 +192,6 @@ class singleCollection extends Component {
             )}
           </div>
         </div>
-        <PhotoUpForm 
-          fileSelectedHandler={this.fileSelectedHandler}
-          fileUploadHandler={this.fileUploadHandler}
-        />
       </div>
       </Fragment>
     );
