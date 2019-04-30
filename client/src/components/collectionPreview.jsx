@@ -15,7 +15,7 @@ function collectionPreview({name, photos, privateBoolean}) {
             <div className="preview-grid">
                 {photos ? (
                     photos.map((photo, i) => {
-                        return <div className="preview-grid-item" key={i}><img src={photo.lowResURL} alt="collection preview item" /></div>
+                        return <div className="preview-grid-item" key={i}><img src={photo.thumbnailURL} alt="collection preview item" /></div>
                     })
                     ) : (
                     <img src={"https://dummyimage.com/400x400/ffffff/000.jpg&text=no+preview+available"} alt="collection preview placeholder" className="card-image"/>

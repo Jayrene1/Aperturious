@@ -24,6 +24,7 @@ const userSchema = new Schema({
 const collectionSchema = new Schema({
   name: { type: String, required: true },
   private: { type: Boolean, default: false },
+  watermarked: { type: Boolean, default: false },
   photos: [{
       type: Schema.Types.ObjectId,
       ref: 'Photo' // array associates collections with photos
@@ -39,9 +40,13 @@ const collectionSchema = new Schema({
 });
 
 const photoSchema = new Schema({
-  highResURL: String,
-  lowResURL: { type: String, required: true },
+  name: { type: String, required: true },
+  highResURL: { type: String, required: true },
   thumbnailURL: String,
+  photographer: {
+    type: Schema.Types.ObjectId,
+    ref: "User"
+  },
   tags: [String],
   hearts: Number,
   downloads: Number

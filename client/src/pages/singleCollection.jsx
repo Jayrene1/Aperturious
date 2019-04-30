@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from "react";
 import Nav from "../components/nav";
+import { PhotoModal, HeartButton, DownloadButton } from "../components/photoModal";
 import Uppy from "@uppy/core";
 import ThumbnailGenerator from "@uppy/thumbnail-generator";
 import { UppyPhotoFormButton } from "../components/uppy";
@@ -25,7 +26,7 @@ class singleCollection extends Component {
   state = {
     photos: [],
     name: "",
-    selectedFiles: [],
+    photoView: {},
     uppy: Uppy({
       meta: { type: "avatar" },
       autoProceed: false,
@@ -44,7 +45,9 @@ class singleCollection extends Component {
     const { match: { params } } = this.props; // THIS IS HOW YOU GET URL PATH VARIABLE
       // initialize materialize modal
       const elems = document.querySelectorAll('.modal');
-      window.M.Modal.init(elems);
+      // remove photo from modal after close
+      const options = {onCloseEnd: () => this.setState({ photoView: {} })};
+      window.M.Modal.init(elems, options);
       // show all photos in collection
       this.populatePhotos(params.id);
       // configure uppy to generate thumbnail versions of photo uploads
@@ -54,8 +57,6 @@ class singleCollection extends Component {
       });
       // attach listener for upload button click - will upload to firebase
       this.uppyUploadListener(params.id);
-      // attach listener for thumbnail generation - will upload to firebase
-        this.uppyThumbnailListener();
   }
 
   populatePhotos(collectionID) {
@@ -67,13 +68,6 @@ class singleCollection extends Component {
             });
         })
         .catch(err => console.log(err));
-  }
-
-  uppyThumbnailListener = () => {
-    this.state.uppy.on("thumbnail:generated", (a, b) => {
-      console.log(a);
-      console.log(b);
-    })
   }
 
   uppyUploadListener(collectionID) {
@@ -137,7 +131,10 @@ class singleCollection extends Component {
       responseType: "blob"
     }).then(res => {
       const thumbFileRef = collectionRef.child(`@thumb${hash}`);
-      const thumbUploadTask = thumbFileRef.put(res.data);
+      const metaData = {
+        contentType: "image/jpeg"
+      };
+      const thumbUploadTask = thumbFileRef.put(res.data, metaData);
       thumbUploadTask.on(
         "state_changed",
         snapshot => {console.log("uploading thumb")},
@@ -146,24 +143,30 @@ class singleCollection extends Component {
         },
         () => {
           thumbUploadTask.snapshot.ref.getDownloadURL().then(thumbnailURL => {
-            this.storePhotoURL(highResURL, thumbnailURL);
+            this.storePhotoURL(hash, highResURL, thumbnailURL);
           });
         }
       );
     });    
   }
 
-  storePhotoURL = (lowResURL, thumbnailURL) => {
+  storePhotoURL = (name, highResURL, thumbnailURL) => {
     // post to mongo, defaulting now to lowResURL
     const photoData = {
-      lowResURL: lowResURL,
-      thumbnailURL: thumbnailURL
+      name: name,
+      highResURL: highResURL,
+      thumbnailURL: thumbnailURL,
+      photographer: this.props.match.params.id
     };
     axios.put(`/api/collections/${this.props.match.params.id}?newPhoto=true`, photoData)
       .then(res => { console.log(res.data);
         this.setState({photos: res.data.photos})
       })
       .catch(err => console.log(err.message));
+  }
+
+  setPhotoView = photo => {
+    this.setState({ photoView: photo });
   }
 
   render() {
@@ -181,8 +184,14 @@ class singleCollection extends Component {
           <div className="masonry-with-columns">
             {this.state.photos ? (
                 this.state.photos.map((photo, index) => 
-                    <div key={index}>
-                        <img className="responsive-img" src={photo.lowResURL} alt="collection item" />
+                    <div key={index} className="masonry-photo">
+                        <a className="modal-trigger" href="#viewbox" onClick={() => this.setPhotoView(photo)}>
+                          <img className="responsive-img" src={photo.thumbnailURL} alt="collection item" />
+                        </a>
+                        <div className="photo-buttons">                        
+                          <HeartButton iconOnly={true}/>
+                          <DownloadButton iconOnly={true} white={true}/>
+                        </div>
                     </div>
                 )
             ) : (
@@ -193,6 +202,7 @@ class singleCollection extends Component {
           </div>
         </div>
       </div>
+      <PhotoModal photo={this.state.photoView} />
       </Fragment>
     );
   }
