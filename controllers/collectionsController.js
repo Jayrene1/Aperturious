@@ -30,6 +30,7 @@ module.exports = {
       db.Collection
       .findById(req.params.id, {photos: {$slice: limit}})
       .populate("photos")
+      .populate("photographer", "username photoURL")
       .then(dbModel => res.json(dbModel))
       .catch(err => res.status(422).json(err));
     } else {

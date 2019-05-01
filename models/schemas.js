@@ -15,7 +15,7 @@ const userSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Collection' // array associates collections with photographers
   }],
-  hearts: [{
+  favorites: [{
       type: Schema.Types.ObjectId,
       ref: 'Photo' // array associates liked photos with users
   }]
@@ -48,7 +48,7 @@ const photoSchema = new Schema({
     ref: "User"
   },
   tags: [String],
-  hearts: Number,
+  favorites: Number,
   downloads: Number
 });
 

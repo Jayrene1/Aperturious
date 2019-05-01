@@ -37,6 +37,7 @@ module.exports = {
   },
   update: function(req, res) { // axios.put("/api/users/:id?newCollection=true", collectionData)
     const newCollection = req.query.newCollection;
+    const addFavorite = req.query.addFavorite;
     if (newCollection === "true") {
       db.Collection
         .create(req.body)
@@ -46,7 +47,15 @@ module.exports = {
             .catch(err => res.status(422).json(err));
         })
         .catch(err => res.status(422).json(err));
-      } else {
+    } else if (addFavorite === "true") {
+      db.Photo.findByIdAndUpdate(req.body._id, {$inc: {favorites: 1}})
+        .then(dbPhoto => {
+          db.User.findByIdAndUpdate(req.params.id, {$push: {favorites: dbPhoto._id}}, {new: true})
+          .then(dbModel => res.json(dbModel))
+          .catch(err => res.status(422).json(err));  
+        })
+        .catch(err => res.status(422).json(err));  
+    } else {
     db.User
       .findOneAndUpdate({ _id: req.params.id }, req.body)
       .then(dbModel => res.json(dbModel))

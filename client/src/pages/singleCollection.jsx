@@ -1,11 +1,12 @@
 import React, { Component, Fragment } from "react";
 import Nav from "../components/nav";
-import { PhotoModal, HeartButton, DownloadButton } from "../components/photoModal";
+import { PhotoModal, FavoriteButton, DownloadButton } from "../components/photoModal";
 import Uppy from "@uppy/core";
 import ThumbnailGenerator from "@uppy/thumbnail-generator";
 import { UppyPhotoFormButton } from "../components/uppy";
 import axios from "axios";
 import { collectionPhotosRef } from "../firebase";
+import { Link } from "react-router-dom";
 import '@uppy/core/dist/style.min.css'
 import '@uppy/dashboard/dist/style.min.css'
 
@@ -24,6 +25,7 @@ import '@uppy/dashboard/dist/style.min.css'
 
 class singleCollection extends Component {
   state = {
+    photographer: {},
     photos: [],
     name: "",
     photoView: {},
@@ -64,7 +66,8 @@ class singleCollection extends Component {
         .then(res => {
             this.setState({
               photos: res.data.photos,
-              name: res.data.name
+              name: res.data.name,
+              photographer: res.data.photographer
             });
         })
         .catch(err => console.log(err));
@@ -74,7 +77,6 @@ class singleCollection extends Component {
     const uppy = this.state.uppy;
 
     uppy.on("upload", data => {
-      console.log(data);
       data.fileIDs.map(id => {
         return new Promise((resolve, reject) => {
           const file = uppy.getFile(id);
@@ -137,7 +139,7 @@ class singleCollection extends Component {
       const thumbUploadTask = thumbFileRef.put(res.data, metaData);
       thumbUploadTask.on(
         "state_changed",
-        snapshot => {console.log("uploading thumb")},
+        snapshot => null,
         error => {
           console.log("Error uploading thumbnail");
         },
@@ -159,7 +161,7 @@ class singleCollection extends Component {
       photographer: this.props.match.params.id
     };
     axios.put(`/api/collections/${this.props.match.params.id}?newPhoto=true`, photoData)
-      .then(res => { console.log(res.data);
+      .then(res => {
         this.setState({photos: res.data.photos})
       })
       .catch(err => console.log(err.message));
@@ -167,6 +169,14 @@ class singleCollection extends Component {
 
   setPhotoView = photo => {
     this.setState({ photoView: photo });
+  }
+
+  addFavorite = photoID => {
+    console.log(`user: ${this.props._id}, photo: ${photoID}`);
+    const photoData = {_id: photoID};
+    axios.put(`/api/users/${this.props._id}?addFavorite=true`, photoData)
+      .then(res => console.log(res))
+      .catch(err => console.log(err.message));
   }
 
   render() {
@@ -189,8 +199,19 @@ class singleCollection extends Component {
                           <img className="responsive-img" src={photo.thumbnailURL} alt="collection item" />
                         </a>
                         <div className="photo-buttons">                        
-                          <HeartButton iconOnly={true}/>
-                          <DownloadButton iconOnly={true} white={true}/>
+                          <FavoriteButton iconOnly={true} favorites={photo.favorites} addFavorite={this.addFavorite} photoID={photo._id}/>
+                          <DownloadButton iconOnly={true} white={true} downloadURL={photo.highResURL}/>
+                        </div>
+                        <div className="photo-photographer">
+                          <Link to={`/users/${this.state.photographer._id}`}>
+                            <div className="chip">
+                              <img
+                                src={this.state.photographer.photoURL}
+                                alt="photographer profile"
+                              />
+                              {this.state.photographer.username}
+                            </div>
+                          </Link>
                         </div>
                     </div>
                 )
@@ -202,7 +223,7 @@ class singleCollection extends Component {
           </div>
         </div>
       </div>
-      <PhotoModal photo={this.state.photoView} />
+      <PhotoModal photo={this.state.photoView} addFavorite={this.addFavorite} />
       </Fragment>
     );
   }
