@@ -1,31 +1,50 @@
 import React, { Fragment } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
-function Nav() {
+function Nav(props) {
   return (
-    <Fragment>
-      <header>
-        <nav>
-          <div className="nav-wrapper grey darken-5">
-            <Link to="/"><img className="brand-logo" src={require("../images/ap-logo-128.svg")} alt="small aperturious logo" viewBox="0px -100 50px 200"/></Link>
-            <ul className="right">
+    <header>
+      <nav className="grey lighten-4">
+        <div className="nav-wrapper">
+          <Link to="/">
+            <img
+              className="brand-logo"
+              src={require("../images/ap-logo-128.svg")}
+              alt="small aperturious logo"
+              viewBox="0px -100 50px 200"
+            />
+          </Link>
+          <ul className="right hide-on-med-and-down">
+            <li>
+              <NavLink to="/home">Home</NavLink>
+            </li>
+            <li>
+              <NavLink to="/collections">Collections</NavLink>
+            </li>
+            <li>
+              <NavLink to="/contact">Photographers</NavLink>
+            </li>
+            {props._id ? (
+              <Fragment>
+                <li>
+                  <NavLink to="/create">Create</NavLink>
+                </li>
+                <li>
+                  <NavLink to={`/user/${props._id}`}>Profile</NavLink>
+                </li>
+                <li>
+                  <NavLink to="/signout">Sign Out</NavLink>
+                </li>
+              </Fragment>
+            ) : (
               <li>
-                <Link to="/collections">Collections</Link>
+                <NavLink to="/register">Join</NavLink>
               </li>
-              <li>
-                <Link to="/contact">Contact</Link>
-              </li>
-              <li>
-                <Link to="/client">Client Area</Link>
-              </li>
-              <li>
-                <Link to="/register">Join</Link>
-              </li>
-            </ul>
-          </div>
-        </nav>
-      </header>
-    </Fragment>
+            )}
+          </ul>
+        </div>
+      </nav>
+    </header>
   );
 }
 

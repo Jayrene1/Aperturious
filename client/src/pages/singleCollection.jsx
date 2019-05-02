@@ -1,5 +1,4 @@
 import React, { Component, Fragment } from "react";
-import Nav from "../components/nav";
 import { PhotoModal, FavoriteButton, DownloadButton } from "../components/photoModal";
 import Uppy from "@uppy/core";
 import ThumbnailGenerator from "@uppy/thumbnail-generator";
@@ -182,7 +181,6 @@ class singleCollection extends Component {
   render() {
     return (
       <Fragment>
-      <Nav />
       <div className="container">
         <div className="row">
           <div className="col s12 center">

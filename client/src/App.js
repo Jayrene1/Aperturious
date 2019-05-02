@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Wrapper from "./components/wrapper";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import Nav from "./components/nav";
 import Home from "./pages/home/index";
 import Register from "./pages/register";
 import Collections from "./pages/collections";
@@ -8,6 +9,7 @@ import SingleCollection from "./pages/singleCollection";
 import Create from "./pages/create";
 import Client from "./pages/client";
 import Contact from "./pages/contact";
+import SignOut from "./pages/signOut";
 import axios from "axios";
 import "./App.css";
 
@@ -18,10 +20,7 @@ import { firebase } from "./firebase";
 
 
 class App extends Component {
-  state = {
-    uid: '', // id of user in FIREBASE
-    data: [] // id of user in MONGO
-  }
+  state = {};
   
   componentDidMount(){
     firebase.auth().onAuthStateChanged(user=> {
@@ -31,12 +30,20 @@ class App extends Component {
           .then(res => {
             this.setState({
               uid: user.uid,
-              _id: res.data._id
+              _id: res.data._id,
+              username: res.data.username,
+              photoURL: res.data.photoURL
             });
           })
           .catch(err => console.log(err));
       } else {
         console.log('user is not signed in');
+        this.setState({
+          uid: "",
+          _id: "",
+          username: "",
+          photoURL: ""
+        });
       } 
     });
   }
@@ -44,17 +51,19 @@ class App extends Component {
   render() {
     return (
       <Router>
+        <Nav _id={this.state._id} username={this.state.username} />
         <Wrapper>
           <Switch>
             <Route exact path="/" component={Home} />
             <Route exact path="/home" component={Home} />
-            <Route exact path="/register" component={Register} />
+            <Route exact path="/register" component={(props) => <Register {...props} username={this.state.username}/>} />
             <Route exact path="/collections" component={Collections} />
             <Route path="/collections/:id" component={(props) => <SingleCollection {...props} _id={this.state._id}/>} />
             <Route exact path="/create" component={(props) => <Create {...props} _id={this.state._id}/>} />
             <Route exact path="/client" component={Client} />
             <Route path="/client/:id" component={Client} />
             <Route exact path="/contact" render={Contact} />
+            <Route exact path="/signout" component={(props) => <SignOut {...props} username={this.state.username} photoURL={this.state.photoURL}/>} />
           </Switch>
         </Wrapper>
       </Router>

@@ -1,5 +1,4 @@
 import React, { Component, Fragment } from "react";
-import Nav from "../components/nav";
 import CollectionForm from "../components/collectionForm";
 import CollectionPreview from "../components/collectionPreview";
 import ProfileForm from "../components/profileForm";
@@ -145,7 +144,6 @@ class Create extends Component {
   render() {
     return (
       <Fragment>
-        <Nav />
         <div className="container">
           <div className="row my-2">
             <div className="col s12 m6 offset-m3 center">

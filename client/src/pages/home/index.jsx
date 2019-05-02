@@ -21,35 +21,6 @@ class Home extends Component {
   render() {
     return (
       <Fragment>
-        <header>
-          <nav className="home-nav">
-            <div className="nav-wrapper home-nav-wrapper grey darken-5">
-              <Link to="/">
-                <img
-                  className="brand-logo"
-                  src={require("../../images/ap-logo-128.svg")}
-                  alt="small aperturious logo"
-                  viewBox="0px -100 50px 200"
-                />
-              </Link>
-              <ul className="right">
-                <li>
-                  <Link to="/collections">Collections</Link>
-                </li>
-                <li>
-                  <Link to="/contact">Contact</Link>
-                </li>
-                <li>
-                  <Link to="/client">Client Area</Link>
-                </li>
-                <li>
-                  <Link to="/register">Join</Link>
-                </li>
-              </ul>
-            </div>
-          </nav>
-        </header>
-
         <div className="landing">
           <div id="img-left" style={styles.imgLeft} />
           <div id="img-right" style={styles.imgRight} />

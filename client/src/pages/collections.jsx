@@ -1,5 +1,4 @@
 import React, { Component, Fragment } from "react";
-import Nav from "../components/nav";
 import CollectionPreview from "../components/collectionPreview";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -48,7 +47,6 @@ class Collections extends Component {
   render() {
     return (
       <Fragment>
-        <Nav />
         <div className="container">
           <div className="row">
             <div className="gallery">

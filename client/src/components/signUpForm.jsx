@@ -3,6 +3,7 @@ import React from "react";
 function SignUp(props) {
     return (
         <form>
+            <h4 className="center-align my-2">Join Aperturious</h4>
             <div className="row">
                 <div className="input-field col s6">
                     <input id="first-name" name="firstName" type="text" value={props.firstName} onChange={props.handleChange}/>
@@ -35,12 +36,13 @@ function SignUp(props) {
 function SignIn(props) {
     return (
         <form>
+            <h4 className="center-align my-2">Login</h4>
             <div className="row">
                 <div className="input-field col s12">
                     <input id="_email" type="email" name="_email" value={props._email} onChange={props.handleChange} />
                     <label htmlFor="_email">Email</label>
                 </div>
-                <div className="input-field col s12">
+                <div className="input-field col s12 mb-2">
                     <input id="_password" type="password" name="_password" value={props._password} onChange={props.handleChange} />
                     <label htmlFor="_password">Password</label>
                 </div>

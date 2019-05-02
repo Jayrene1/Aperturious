@@ -1,5 +1,4 @@
 import React, { Component, Fragment } from "react";
-import Nav from "../components/nav";
 import { SignIn, SignUp } from "../components/signUpForm";
 import axios from "axios";
 import { firebase } from "../firebase";
@@ -13,7 +12,7 @@ import { firebase } from "../firebase";
 
 class Register extends Component {
   state = {
-    signUpClicked: false,
+    signUpClicked: true,
     firstName: "",
     lastName: "",
     email: "",
@@ -31,11 +30,11 @@ class Register extends Component {
     event.preventDefault();
     const { name } = event.target;
     if (name === "signIn" && this.state.signUpClicked === true) {
-      this.setState({signUpClicked: false});
+      this.setState({ signUpClicked: false });
     } else if (name === "signUp" && this.state.signUpClicked === false) {
-      this.setState({signUpClicked: true});
+      this.setState({ signUpClicked: true });
     }
-  }
+  };
 
   handleChange = event => {
     const { name, value } = event.target;
@@ -44,7 +43,8 @@ class Register extends Component {
 
   handleSignUpSubmit = event => {
     event.preventDefault();
-    firebase.auth()
+    firebase
+      .auth()
       .createUserWithEmailAndPassword(this.state.email, this.state.password)
       .then(user => {
         const userData = {
@@ -53,15 +53,16 @@ class Register extends Component {
           email: this.state.email
         };
         if (this.state.firstName) {
-            userData.firstName = this.state.firstName;
+          userData.firstName = this.state.firstName;
         }
         if (this.state.lastName) {
-            userData.lastName = this.state.lastName;
+          userData.lastName = this.state.lastName;
         }
 
-        axios.post("api/users", userData)
+        axios
+          .post("api/users", userData)
           .then(() => {
-            this.props.history.push('/create');
+            this.props.history.push("/create");
           })
           .catch(err => console.log(err));
       })
@@ -70,36 +71,49 @@ class Register extends Component {
 
   handleSignInSubmit = event => {
     event.preventDefault();
-    firebase.auth()
+    firebase
+      .auth()
       .signInWithEmailAndPassword(this.state._email, this.state._password)
-        .then(user => {
-          console.log("SIGNED IN");
-          this.props.history.push('/create');
-        })
-        .catch(err => console.log(err));
-    };
+      .then(user => {
+        console.log("SIGNED IN");
+        this.props.history.push("/create");
+      })
+      .catch(err => console.log(err));
+  };
 
   render() {
     return (
       <Fragment>
-        <Nav />
         <div className="container">
           <div className="row">
             <div className="col s12 m8 offset-m2 my-2">
               <div className="card my-2">
-                <div className="card-content">
-                  <div className="col s12 m6 offset-m3 center">
-                    <button className="waves-effect btn-flat" name="signIn" onClick={this.handleFormSwap}>Sign In</button>
-                    <button className="waves-effect btn-flat" name="signUp" onClick={this.handleFormSwap}>Sign Up</button>
+                <div className="card-content center-align">
+                  <div className="col s12 mb-2">
+                    <button
+                      className={`waves-effect btn-flat ${!this.state.signUpClicked && "underline"}`}
+                      name="signIn"
+                      onClick={this.handleFormSwap}
+                    >
+                      Sign In
+                    </button>
+                    <button
+                      className={`waves-effect btn-flat ${this.state.signUpClicked && "underline"}`}
+                      name="signUp"
+                      onClick={this.handleFormSwap}
+                    >
+                      Sign Up
+                    </button>
                   </div>
                   {this.state.signUpClicked ? (
                     <SignUp
                       signUp={this.state}
                       handleChange={this.handleChange}
                       handleSubmit={this.handleSignUpSubmit}
+                      handleFormSwap={this.handleFormSwap}
                     />
                   ) : (
-                    <SignIn 
+                    <SignIn
                       _email={this.state._email}
                       _password={this.state._password}
                       handleChange={this.handleChange}
