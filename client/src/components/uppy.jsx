@@ -31,7 +31,7 @@ class UppyPhotoFormButton extends React.Component {
     render () {
       return (
         <div>
-          <button className="waves-effect btn" onClick={this.handleOpen}>Upload A New Photo</button>
+          <button className="waves-effect btn" onClick={this.handleOpen}>Upload A New Photo <i className="material-icons right">add_a_photo</i></button>
           <DashboardModal
             uppy={this.props.uppy}
             closeModalOnClickOutside

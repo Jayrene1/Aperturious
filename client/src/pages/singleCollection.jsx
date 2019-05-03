@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from "react";
-import { PhotoModal, FavoriteButton, DownloadButton } from "../components/photoModal";
+import { PhotoModal, FavoriteButton, DownloadButton, DeleteButton, DeleteModal } from "../components/photoModal";
 import Uppy from "@uppy/core";
 import ThumbnailGenerator from "@uppy/thumbnail-generator";
 import { UppyPhotoFormButton } from "../components/uppy";
@@ -24,10 +24,12 @@ import '@uppy/dashboard/dist/style.min.css'
 
 class singleCollection extends Component {
   state = {
+    ownsCollection: false,
     photographer: {},
     photos: [],
     name: "",
     photoView: {},
+    nameForDelete: {},
     uppy: Uppy({
       meta: { type: "avatar" },
       autoProceed: false,
@@ -38,17 +40,9 @@ class singleCollection extends Component {
     })
   }
 
-  componentWillMount() {
-    document.title = "Aperturious - Collection";
-  }
-
   componentDidMount() {
+    document.title = "Aperturious - Collection";
     const { match: { params } } = this.props; // THIS IS HOW YOU GET URL PATH VARIABLE
-      // initialize materialize modal
-      const elems = document.querySelectorAll('.modal');
-      // remove photo from modal after close
-      const options = {onCloseEnd: () => this.setState({ photoView: {} })};
-      window.M.Modal.init(elems, options);
       // show all photos in collection
       this.populatePhotos(params.id);
       // configure uppy to generate thumbnail versions of photo uploads
@@ -67,9 +61,26 @@ class singleCollection extends Component {
               photos: res.data.photos,
               name: res.data.name,
               photographer: res.data.photographer
+            }, () => {
+              if (this.props._id === this.state.photographer._id) {
+                this.setState({ ownsCollection: true }, () => {
+                  this.initializeModals();
+                });
+              }
             });
         })
         .catch(err => console.log(err));
+  }
+
+  initializeModals = () => {
+    // initialize materialize modal
+    const elems = document.querySelectorAll('.modal');
+    // remove photo from modal after close
+    const options = {onCloseEnd: () => this.setState({ 
+      photoView: {},
+      nameForDelete: {}
+    })};
+    window.M.Modal.init(elems, options);    
   }
 
   uppyUploadListener(collectionID) {
@@ -178,27 +189,61 @@ class singleCollection extends Component {
       .catch(err => console.log(err.message));
   }
 
+  selectForDelete = (photoID, name) => {
+    const photoData = {
+      _id: photoID,
+      name: name
+    };
+    this.setState({ nameForDelete: photoData });
+  }
+
+  deletePhoto = () => {
+    console.log(this.state.nameForDelete);
+    const collectionRef = collectionPhotosRef.child(this.props.match.params.id);
+    const fileRef = collectionRef.child(this.state.nameForDelete.name);
+    const thumbFileRef = collectionRef.child(`@thumb${this.state.nameForDelete.name}`);
+    fileRef.delete().then(() => {
+      thumbFileRef.delete().then(() => {
+        // axios call to remove from mongodb
+      }).catch(err => {
+        console.log(err);
+      });
+    }).catch(err => {
+      console.log(err);
+    });
+  }
+
   render() {
     return (
       <Fragment>
       <div className="container">
         <div className="row">
           <div className="col s12 center">
-            <h5>{this.state.name}</h5>
-            <UppyPhotoFormButton uppy={this.state.uppy} />
+            <h3>{this.state.name}</h3>
+          </div>
+          </div>
+          <div className="row my-2">
+            <div className="divider" />
+
+          <div className="col s12 center">
+            <div className="flex-title-button my-1">
+              <Link to={`/users/${this.state.photographer._id}`}><h5>by {this.state.photographer.username}</h5></Link>
+              {this.state.ownsCollection ? <UppyPhotoFormButton uppy={this.state.uppy} /> : <span />}
+            </div>
           </div>
         </div>
         <div className="row">
           <div className="masonry-with-columns">
             {this.state.photos ? (
                 this.state.photos.map((photo, index) => 
-                    <div key={index} className="masonry-photo">
+                    <div key={photo.name} className="masonry-photo">
                         <a className="modal-trigger" href="#viewbox" onClick={() => this.setPhotoView(photo)}>
                           <img className="responsive-img" src={photo.thumbnailURL} alt="collection item" />
                         </a>
                         <div className="photo-buttons">                        
-                          <FavoriteButton iconOnly={true} favorites={photo.favorites} addFavorite={this.addFavorite} photoID={photo._id}/>
+                          {!this.state.ownsCollection && <FavoriteButton iconOnly={true} favorites={photo.favorites} addFavorite={this.addFavorite} photoID={photo._id}/>}
                           <DownloadButton iconOnly={true} white={true} downloadURL={photo.highResURL}/>
+                          {this.state.ownsCollection && <DeleteButton photoID={photo._id} name={photo.name} selectForDelete={this.selectForDelete} />}
                         </div>
                         <div className="photo-photographer">
                           <Link to={`/users/${this.state.photographer._id}`}>
@@ -221,7 +266,8 @@ class singleCollection extends Component {
           </div>
         </div>
       </div>
-      <PhotoModal photo={this.state.photoView} addFavorite={this.addFavorite} />
+      <PhotoModal photo={this.state.photoView} addFavorite={this.addFavorite} owned={this.state.ownsCollection} />
+      <DeleteModal deletePhoto={this.deletePhoto} />
       </Fragment>
     );
   }

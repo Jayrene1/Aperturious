@@ -21,12 +21,8 @@ class Collections extends Component {
     offsetInt: 0
   };
 
-  componentWillMount() {
-    document.title = "Aperturious - Collections";
-  }
-
   componentDidMount() {
-    //const { match: { params } } = this.props; // THIS IS HOW YOU GET URL PATH VARIABLE
+    document.title = "Aperturious - Collections";
     const elems = document.querySelectorAll(".modal");
     window.M.Modal.init(elems);
     this.populateCollections();
@@ -48,6 +44,18 @@ class Collections extends Component {
     return (
       <Fragment>
         <div className="container">
+          <div className="row my-2">
+            <div className="col s12 center">
+              <h3>Browse Collections</h3>
+            </div>
+          </div>
+          <div className="row my-2">
+            <div className="divider" />
+
+            <div className="col s12">
+              <h5>Recent Collections</h5>
+            </div>
+          </div>
           <div className="row">
             <div className="gallery">
               {this.state.collectionPreviews ? (

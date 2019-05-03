@@ -5,6 +5,10 @@
   flex-direction: column;
 }
 
+header {
+  margin-bottom: 1.5px;
+}
+
 main {
   flex: 1 0 auto;
 }
@@ -15,6 +19,22 @@ h1, h2, h3, h4, h5, h6 {
 
 p, a {
   font-family: 'Roboto', sans-serif;
+}
+
+footer {
+  padding-top: 8px !important;
+}
+
+/* Page Background */
+
+.register-bg {
+  background-image: linear-gradient( rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5) ), url("./images/register-bg1.jpg");
+  width: 100%;
+  height: 100vh;
+  background-size:cover;
+  position: absolute;
+  top: 65px;
+  z-index: 0;
 }
 
 /* Header Styles */
@@ -42,23 +62,6 @@ nav ul a {
 
 .h-33 {
   min-height: 33.3vh;
-}
-
-.blue-accent {
-  color: #2f4395 !important;
-}
-
-.blue-bg {
-  background-color: #2f4395 !important;
-}
-
-
-.gold-accent {
-  color: #d5b34b !important;
-}
-
-.gold-bg {
-  background-color: #d5b34b !important;
 }
 
 .my-1 {
@@ -93,6 +96,12 @@ nav ul a {
   padding: 2rem 0 2rem 0;
 }
 
+.flex-title-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 /* Register page styles */
 .underline {
   border-bottom: #9e9e9e solid 1.5px;
@@ -108,7 +117,7 @@ nav ul a {
 
 /* Gallery Styles */
 
-.gallery > a {
+.gallery a {
   color: rgba(0, 0, 0, 0.87);
 }
 
@@ -191,6 +200,10 @@ nav ul a {
 }
 
 #viewbox .material-icons {
+  font-size: 2rem;
+}
+
+.photo-buttons .material-icons {
   font-size: 2rem;
 }
 

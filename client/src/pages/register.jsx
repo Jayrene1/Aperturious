@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 import { SignIn, SignUp } from "../components/signUpForm";
 import axios from "axios";
 import { firebase } from "../firebase";
@@ -22,7 +22,7 @@ class Register extends Component {
     _password: ""
   };
 
-  componentWillMount() {
+  componentDidMount() {
     document.title = "Aperturious - Register";
   }
 
@@ -83,9 +83,9 @@ class Register extends Component {
 
   render() {
     return (
-      <Fragment>
+      <div className="register-bg">
         <div className="container">
-          <div className="row">
+          <div className="row my-2">
             <div className="col s12 m8 offset-m2 my-2">
               <div className="card my-2">
                 <div className="card-content center-align">
@@ -125,7 +125,7 @@ class Register extends Component {
             </div>
           </div>
         </div>
-      </Fragment>
+      </div>
     );
   }
 }

@@ -1,10 +1,10 @@
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 import { firebase } from "../firebase";
 
 class SignOut extends Component {
   state = {};
 
-  componentWillMount() {
+  componentDidMount() {
     document.title = "Aperturious - Sign Out";
   }
 
@@ -15,9 +15,9 @@ class SignOut extends Component {
 
   render() {
     return (
-      <Fragment>
+      <div className="register-bg">
         <div className="container">
-          <div className="row">
+          <div className="row my-2">
             <div className="col s12 m8 offset-m2 my-2">
               <div className="card my-2">
                 <div className="card-content center-align">
@@ -36,7 +36,7 @@ class SignOut extends Component {
             </div>
           </div>
         </div>
-      </Fragment>
+      </div>
     );
   }
 }

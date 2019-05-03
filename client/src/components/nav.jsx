@@ -1,10 +1,11 @@
 import React, { Fragment } from "react";
 import { Link, NavLink } from "react-router-dom";
 
+
 function Nav(props) {
   return (
     <header>
-      <nav className="grey lighten-4">
+      <nav className="grey lighten-5">
         <div className="nav-wrapper">
           <Link to="/">
             <img
@@ -38,7 +39,7 @@ function Nav(props) {
               </Fragment>
             ) : (
               <li>
-                <NavLink to="/register">Join</NavLink>
+                <NavLink to="/register"><button className="btn green">Join</button></NavLink>
               </li>
             )}
           </ul>

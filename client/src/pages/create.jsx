@@ -30,11 +30,8 @@ class Create extends Component {
     phone: ""
   };
 
-  componentWillMount() {
-    document.title = "Aperturious - Create";
-  }
-
   componentDidMount() {
+    document.title = "Aperturious - Create";
     const elems = document.querySelectorAll(".modal");
     window.M.Modal.init(elems);
     if (this.props._id) {
@@ -146,6 +143,18 @@ class Create extends Component {
       <Fragment>
         <div className="container">
           <div className="row my-2">
+            <div className="col s12 center">
+              <h3>Create</h3>
+            </div>
+          </div>
+          <div className="row my-2">
+            <div className="divider" />
+
+            <div className="col s12">
+              <h5>My Profile</h5>
+            </div>
+          </div>
+          <div className="row my-2">
             <div className="col s12 m6 offset-m3 center">
               <img
                 className="circle profile-photo"
@@ -168,39 +177,43 @@ class Create extends Component {
               />
             </div>
           </div>
+
           <div className="divider" />
+
           <div className="row">
-            <div className="col s12 center my-2">
-              <a
-                className="waves-effect btn modal-trigger"
-                href="#collection-form"
-              >
-                Create Collection
-              </a>
-            </div>
-          </div>
-          <div className="divider" />
-          <div className="row">
-            <div className="gallery">
-              {this.state.collectionPreviews ? (
-                this.state.collectionPreviews.map((collection, index) => (
-                  <Link to={`/collections/${collection._id}`}>
-                    <div className="col s12 m6 l4">
-                      <CollectionPreview
-                        key={index}
-                        name={collection.name}
-                        photographer={collection.photographer}
-                        photos={collection.photos}
-                        privateBoolean={collection.private}
-                      />
-                    </div>
-                  </Link>
-                ))
-              ) : (
-                <div className="col s12 m6 col-offset-m3 center my-2">
-                  <h5>You have no collections yet...</h5>
-                </div>
-              )}
+            <div className="col s12">
+              <div className="flex-title-button">
+                <h5>My Collections</h5>
+                <a
+                  className="waves-effect btn green darken-1 modal-trigger my-2"
+                  href="#collection-form"
+                >
+                  New Collection
+                  <i class="material-icons right">add</i>
+                </a>
+              </div>
+
+              <div className="gallery my-2">
+                {this.state.collectionPreviews ? (
+                  this.state.collectionPreviews.map((collection, index) => (
+                    <Link to={`/collections/${collection._id}`}>
+                      <div className="col s12 m6 l4">
+                        <CollectionPreview
+                          key={index}
+                          name={collection.name}
+                          photographer={collection.photographer}
+                          photos={collection.photos}
+                          privateBoolean={collection.private}
+                        />
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <div className="col s12 m6 col-offset-m3 center my-2">
+                    <h5>You have no collections yet...</h5>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
