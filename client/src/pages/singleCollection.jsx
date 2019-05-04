@@ -6,6 +6,7 @@ import { UppyPhotoFormButton } from "../components/uppy";
 import axios from "axios";
 import { collectionPhotosRef } from "../firebase";
 import { Link } from "react-router-dom";
+import watermark, { text } from "watermarkjs";
 import '@uppy/core/dist/style.min.css'
 import '@uppy/dashboard/dist/style.min.css'
 
@@ -57,10 +58,15 @@ class singleCollection extends Component {
   populatePhotos(collectionID) {
     axios.get(`/api/collections/${collectionID}?populate=true`)
         .then(res => {
+            if (res.data.watermarked) {
+              this.watermark(res.data.photos);
+            } else {
+              this.setState({ photos: res.data.photos });
+            }
             this.setState({
-              photos: res.data.photos,
               name: res.data.name,
-              photographer: res.data.photographer
+              photographer: res.data.photographer,
+              watermarked: res.data.watermarked
             }, () => {
               if (this.props._id === this.state.photographer._id) {
                 this.setState({ ownsCollection: true }, () => {
@@ -81,6 +87,23 @@ class singleCollection extends Component {
       nameForDelete: {}
     })};
     window.M.Modal.init(elems, options);    
+  }
+
+  watermark = photos => {
+    let watermarked = [];
+    const options = {
+      init: function(img) {
+        img.crossOrigin = 'Anonymous'
+      }
+    };
+    for (let i = 0; i < photos.length; i++) {
+      watermark([photos[i].thumbnailURL], options)
+        .image(text.lowerRight('aperturious.com', '48px Roboto', '#fff', 0.5))
+        .then(img => {
+          watermarked.push(img);
+        });
+    }
+    this.setState({ photos: watermarked });
   }
 
   uppyUploadListener(collectionID) {
