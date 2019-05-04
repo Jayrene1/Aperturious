@@ -13,14 +13,15 @@ function collectionPreview({name, photos, privateBoolean}) {
     return (
         <div className="card collection-preview">
             <div className="preview-grid">
-                {photos ? (
-                    photos.map((photo, i) => {
-                        return <div className="preview-grid-item" key={i}><img src={photo.thumbnailURL} alt="collection preview item" /></div>
-                    })
-                    ) : (
-                    <img src={"https://dummyimage.com/400x400/ffffff/000.jpg&text=no+preview+available"} alt="collection preview placeholder" className="card-image"/>
-                    )
-                }
+                <div className="preview-grid-item">
+                    {photos[0] ? <img src={photos[0].thumbnailURL} alt="collection preview item" /> : null}
+                </div>
+                <div className="preview-grid-item">
+                    {photos[1] ? <img src={photos[1].thumbnailURL} alt="collection preview item" /> : null}
+                </div>
+                <div className="preview-grid-item">
+                    {photos[2] ? <img src={photos[2].thumbnailURL} alt="collection preview item" /> : null}
+                </div>
             </div>
             <div className="card-content">
                 <h5>{name}</h5>

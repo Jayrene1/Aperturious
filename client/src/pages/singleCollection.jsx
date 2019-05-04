@@ -25,9 +25,11 @@ import '@uppy/dashboard/dist/style.min.css'
 
 class singleCollection extends Component {
   state = {
+    watermarked: false,
     ownsCollection: false,
     photographer: {},
     photos: [],
+    watermarkedPhotos: [],
     name: "",
     photoView: {},
     nameForDelete: {},
@@ -60,13 +62,13 @@ class singleCollection extends Component {
         .then(res => {
             if (res.data.watermarked) {
               this.watermark(res.data.photos);
+              this.setState({watermarked: true});
             } else {
-              this.setState({ photos: res.data.photos });
+              this.setState({photos: res.data.photos});
             }
             this.setState({
               name: res.data.name,
-              photographer: res.data.photographer,
-              watermarked: res.data.watermarked
+              photographer: res.data.photographer
             }, () => {
               if (this.props._id === this.state.photographer._id) {
                 this.setState({ ownsCollection: true }, () => {
@@ -90,20 +92,26 @@ class singleCollection extends Component {
   }
 
   watermark = photos => {
+    let clone = JSON.parse(JSON.stringify(photos));
     let watermarked = [];
     const options = {
       init: function(img) {
-        img.crossOrigin = 'Anonymous'
+        img.crossOrigin = '*'
       }
     };
-    for (let i = 0; i < photos.length; i++) {
-      watermark([photos[i].thumbnailURL], options)
-        .image(text.lowerRight('aperturious.com', '48px Roboto', '#fff', 0.5))
-        .then(img => {
-          watermarked.push(img);
+    for (let i = 0; i < clone.length; i++) {
+      watermark([clone[i].thumbnailURL], options)
+        .image(text.center('APERTURIOUS', '48px Roboto', '#fff', 0.6))
+        .then(img => {      
+          clone[i].thumbnailURL = img.currentSrc;
+          document.getElementById('root').appendChild(img);
+          console.log(clone);
         });
     }
-    this.setState({ photos: watermarked });
+    this.setState({ 
+      watermarkedPhotos: watermarked,
+      photos: clone
+    });
   }
 
   uppyUploadListener(collectionID) {

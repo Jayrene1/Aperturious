@@ -6,7 +6,7 @@ import React, { Fragment } from "react";
     - contact form that goes to me? About info for website? Legal stuff?
 */
 
-function Contact() {
+function Users() {
     return (
         <Fragment>
             <h1>CONTACT</h1>
@@ -14,4 +14,4 @@ function Contact() {
     );
 }
 
-export default Contact;
+export default Users;

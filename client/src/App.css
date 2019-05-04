@@ -170,16 +170,19 @@ nav ul a {
 .preview-grid > div:nth-child(1) {
   grid-column-start: span 2;
   grid-row-start: span 3;
+  background-color: #e0e0e0;
 }
 
 .preview-grid > div:nth-child(2) {
   grid-column: 3/3;
   grid-row-start: span 2;
+  background-color: #eeeeee;
 }
 
 .preview-grid > div:nth-child(3) {
   grid-column: 3/3;
   grid-row: 3/3;
+  background-color: #bdbdbd;
 }
 
 /* Photo Modal Styles */
