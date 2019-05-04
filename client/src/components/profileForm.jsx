@@ -33,7 +33,7 @@ function ProfileForm(props) {
                     <label htmlFor="phone">Phone Number</label>
                 </div>
                 <div className="input-field col s12 center">
-                    <button type="submit" className="btn" onClick={props.handleSubmit}>Save Changes</button>
+                    <button type="submit" className="btn light-blue" onClick={props.handleSubmit}>Save Changes</button>
                 </div>    
             </div>
         </form>

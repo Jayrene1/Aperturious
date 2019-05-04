@@ -19,17 +19,21 @@ function CollectionForm(props) {
                     <div className="row">
                         <div className="input-field col s12">
                             <input id="name" type="text" name="name" value={props.name} onChange={props.handleChange} required/>
-                            <label htmlFor="name">Name of Collection</label>
+                            <label>Name of Collection</label>
                         </div>
-                        <div className="input-field col s12 center-align">
-                            <p>
-                            <label>
-                                <input name="private" type="checkbox" checked={props.private} onChange={props.handleChange}/>
-                                <span>Private</span>
-                                <span className="mx-1"></span>
-                                <span><i>(Collections are public by default)</i></span>
-                            </label>
-                            </p>
+                        <div className="input-field col s12 m6 center-align">
+                            <select name="private" value={props.private} onChange={props.handleChange}>
+                                <option value={false}>False</option>
+                                <option value={true}>True</option>
+                            </select>
+                            <label htmlFor="private">Is this collection private?</label>
+                        </div>
+                        <div className="input-field col s12 m6 center-align">
+                            <select name="watermarked" value={props.watermarked} onChange={props.handleChange}>
+                                <option value={false}>No</option>
+                                <option value={true}>Yes</option>
+                            </select>
+                            <label>Add Watermarks?</label>
                         </div>
                         {props.private ? <Password password={ props.password } handleChange={props.handleChange} /> : <span></span>}
                         <div className="input-field col s12 center">

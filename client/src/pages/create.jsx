@@ -22,6 +22,7 @@ class Create extends Component {
     collectionPreviews: [],
     name: "",
     private: false,
+    watermarked: false,
     password: "",
     profilePhoto: "",
     firstName: "",
@@ -32,8 +33,10 @@ class Create extends Component {
 
   componentDidMount() {
     document.title = "Aperturious - Create";
-    const elems = document.querySelectorAll(".modal");
-    window.M.Modal.init(elems);
+    const modal = document.querySelectorAll(".modal");
+    window.M.Modal.init(modal);
+    const select = document.querySelectorAll('select');
+    window.M.FormSelect.init(select);
     if (this.props._id) {
       this.populateCollections();
     }
@@ -43,7 +46,6 @@ class Create extends Component {
     axios
       .get(`/api/users/${this.props._id}?populate=true&photoLimit=3`)
       .then(res => {
-        console.log(res);
         this.setState(
           {
             collectionPreviews: res.data.collections,
@@ -63,7 +65,7 @@ class Create extends Component {
     event.preventDefault();
     const target = event.target;
     const name = target.name;
-    const value = target.type === "checkbox" ? target.checked : target.value;
+    const value = target.value;
     this.setState({ [name]: value });
   };
 
@@ -117,6 +119,7 @@ class Create extends Component {
     let collectionData = {
       name: this.state.name,
       private: this.state.private,
+      watermarked: this.state.watermarked,
       photographer: this.props._id
     };
 
@@ -189,17 +192,16 @@ class Create extends Component {
                   href="#collection-form"
                 >
                   New Collection
-                  <i class="material-icons right">add</i>
+                  <i className="material-icons right">add</i>
                 </a>
               </div>
 
               <div className="gallery my-2">
                 {this.state.collectionPreviews ? (
                   this.state.collectionPreviews.map((collection, index) => (
-                    <Link to={`/collections/${collection._id}`}>
+                    <Link to={`/collections/${collection._id}`} key={collection._id}>
                       <div className="col s12 m6 l4">
                         <CollectionPreview
-                          key={index}
                           name={collection.name}
                           photographer={collection.photographer}
                           photos={collection.photos}
@@ -220,6 +222,7 @@ class Create extends Component {
         <CollectionForm
           name={this.state.name}
           private={this.state.private}
+          watermarked={this.state.watermarked}
           password={this.state.password}
           handleChange={this.handleChange}
           handleCreateCollection={this.handleCreateCollection}
