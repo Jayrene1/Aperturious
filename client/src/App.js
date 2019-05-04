@@ -7,8 +7,8 @@ import Register from "./pages/register";
 import Collections from "./pages/collections";
 import SingleCollection from "./pages/singleCollection";
 import Create from "./pages/create";
-import Client from "./pages/client";
-import Contact from "./pages/contact";
+import Users from "./pages/users";
+import SingleUser from "./pages/singleUser";
 import SignOut from "./pages/signOut";
 import axios from "axios";
 import "./App.css";
@@ -61,9 +61,8 @@ class App extends Component {
             <Route exact path="/collections" component={Collections} />
             <Route path="/collections/:id" component={(props) => <SingleCollection {...props} _id={this.state._id}/>} />
             <Route exact path="/create" component={(props) => <Create {...props} _id={this.state._id}/>} />
-            <Route exact path="/client" component={Client} />
-            <Route path="/client/:id" component={Client} />
-            <Route exact path="/contact" render={Contact} />
+            <Route exact path="/users" component={Users} />
+            <Route exact path="/users/:id" component={(props) => <SingleUser {...props} _id={this.state._id}/>} />
             <Route exact path="/signout" component={(props) => <SignOut {...props} username={this.state.username} photoURL={this.state.photoURL}/>} />
           </Switch>
         </Wrapper>
