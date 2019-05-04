@@ -115,6 +115,18 @@ nav ul a {
   height: 275px;
 }
 
+.profile-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 100%;
+  margin-top: auto;
+}
+
+.profile-details p {
+  font-size: 1.25rem;
+}
+
 /* Gallery Styles */
 
 .gallery a {

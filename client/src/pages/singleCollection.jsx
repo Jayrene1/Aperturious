@@ -93,7 +93,7 @@ class singleCollection extends Component {
 
   watermark = photos => {
     let clone = JSON.parse(JSON.stringify(photos));
-    let watermarked = [];
+    //let watermarked = [];
     const options = {
       init: function(img) {
         img.crossOrigin = '*'
@@ -103,15 +103,18 @@ class singleCollection extends Component {
       watermark([clone[i].thumbnailURL], options)
         .image(text.center('APERTURIOUS', '48px Roboto', '#fff', 0.6))
         .then(img => {      
-          clone[i].thumbnailURL = img.currentSrc;
-          document.getElementById('root').appendChild(img);
-          console.log(clone);
+          //clone[i].thumbnailURL = img.currentSrc;
+          img.className = "responsive-img";
+          const div = document.createElement("div");
+          div.className = "masonry-photo";
+          div.appendChild(img);
+          document.getElementById('masonry-with-columns').appendChild(div);
         });
     }
-    this.setState({ 
+    /*this.setState({ 
       watermarkedPhotos: watermarked,
       photos: clone
-    });
+    });*/
   }
 
   uppyUploadListener(collectionID) {
@@ -264,7 +267,7 @@ class singleCollection extends Component {
           </div>
         </div>
         <div className="row">
-          <div className="masonry-with-columns">
+          <div className="masonry-with-columns" id="masonry-with-columns">
             {this.state.photos ? (
                 this.state.photos.map((photo, index) => 
                     <div key={photo.name} className="masonry-photo">

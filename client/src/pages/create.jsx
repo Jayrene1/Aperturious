@@ -50,6 +50,7 @@ class Create extends Component {
           {
             collectionPreviews: res.data.collections,
             profilePhoto: res.data.photoURL,
+            username: res.data.username,
             firstName: res.data.firstName,
             lastName: res.data.lastName,
             email: res.data.email,
@@ -85,6 +86,7 @@ class Create extends Component {
       () => {
         photoUploadTask.snapshot.ref.getDownloadURL().then(url => {
           this.storePhotoURL(url);
+          this.setState({ profilePhoto: url })
         });
       }
     );
@@ -94,7 +96,7 @@ class Create extends Component {
     // post to mongo
     axios
       .put(`/api/users/${this.props._id}`, { photoURL: url })
-      .then(res => this.setState({ profilePhoto: res.data.photoURL }))
+      .then(res => null)
       .catch(err => console.log(err.message));
   };
 
@@ -154,11 +156,19 @@ class Create extends Component {
             <div className="divider" />
 
             <div className="col s12">
-              <h5>My Profile</h5>
+              <div className="flex-title-button">
+                <h5>My Profile</h5> 
+                <a
+                className="waves-effect btn blue darken-1 modal-trigger my-2"
+                href="#profile-form"
+                >
+                  Edit Profile Details
+                </a>
+              </div>
             </div>
           </div>
-          <div className="row my-2">
-            <div className="col s12 m6 offset-m3 center">
+          <div className="row my-2 profile-details">
+            <div className="col s12 m4 center">
               <img
                 className="circle profile-photo"
                 src={
@@ -168,16 +178,15 @@ class Create extends Component {
                 alt="user-profile"
               />
             </div>
-            <div className="col s12">
-              <ProfileForm
-                firstName={this.state.firstName}
-                lastName={this.state.lastName}
-                email={this.state.email}
-                phone={this.state.phone}
-                fileSelectedHandler={this.fileSelectedHandler}
-                handleChange={this.handleChange}
-                handleSubmit={this.handleProfileSubmit}
-              />
+            <div className="col s12 m8 center">
+              <div className="col s12 m6 left-align">
+                <p>Username: {this.state.username || "unavailable"}</p>
+                <p>Full Name : {this.state.firstName || "unavailable"} {this.state.lastName}</p>
+              </div>
+              <div className="col s12 m6 left-align">
+                <p>Email: {this.state.email || "unavailable"}</p>
+                <p>Phone : {this.state.phone || "unavailable"}</p>
+              </div>
             </div>
           </div>
 
@@ -226,6 +235,15 @@ class Create extends Component {
           password={this.state.password}
           handleChange={this.handleChange}
           handleCreateCollection={this.handleCreateCollection}
+        />
+        <ProfileForm
+        firstName={this.state.firstName}
+        lastName={this.state.lastName}
+        email={this.state.email}
+        phone={this.state.phone}
+        fileSelectedHandler={this.fileSelectedHandler}
+        handleChange={this.handleChange}
+        handleSubmit={this.handleProfileSubmit}
         />
       </Fragment>
     );

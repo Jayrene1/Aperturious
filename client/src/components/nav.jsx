@@ -23,7 +23,7 @@ function Nav(props) {
               <NavLink to="/collections">Collections</NavLink>
             </li>
             <li>
-              <NavLink to="/contact">Photographers</NavLink>
+              <NavLink to="/users">Photographers</NavLink>
             </li>
             {props._id ? (
               <Fragment>
