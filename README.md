@@ -12,8 +12,8 @@ Public photo collections and user accounts are publically available without auth
 
 To experiment with user features, sign in with a guest account: 
 
-Email: guest@example.com
-Password: guestuser
+Email: `guest@example.com`
+Password: `guestuser`
 
 ### React
 
