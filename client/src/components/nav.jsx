@@ -31,7 +31,7 @@ function Nav(props) {
                   <NavLink to="/create">Create</NavLink>
                 </li>
                 <li>
-                  <NavLink to={`/user/${props._id}`}>Profile</NavLink>
+                  <NavLink to={`/users/${props._id}`}>Profile</NavLink>
                 </li>
                 <li>
                   <NavLink to="/signout">Sign Out</NavLink>
