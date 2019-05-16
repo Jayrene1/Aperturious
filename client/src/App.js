@@ -21,7 +21,7 @@ import { firebase } from "./firebase";
 
 class App extends Component {
   state = {};
-  
+
   componentDidMount(){
     firebase.auth().onAuthStateChanged(user=> {
       if(user){
@@ -44,7 +44,7 @@ class App extends Component {
           username: "",
           photoURL: ""
         });
-      } 
+      }
     });
   }
 
@@ -62,7 +62,7 @@ class App extends Component {
             <Route path="/collections/:id" component={(props) => <SingleCollection {...props} _id={this.state._id}/>} />
             <Route exact path="/create" component={(props) => <Create {...props} _id={this.state._id}/>} />
             <Route exact path="/users" component={Users} />
-            <Route exact path="/users/:id" component={(props) => <SingleUser {...props} _id={this.state._id}/>} />
+            <Route exact path="/users/:id" component={SingleUser} />
             <Route exact path="/signout" component={(props) => <SignOut {...props} username={this.state.username} photoURL={this.state.photoURL}/>} />
           </Switch>
         </Wrapper>

@@ -11,18 +11,12 @@ class SingleUser extends Component {
   componentDidMount() {
     document.title = "Aperturious - User Profile";
     this.populateCollections(this.props.match.params.id);
-    console.log(this.props.match.params.id);
-  }
-
-  componentDidUpdate() {
-      console.log(this.state.user);
-      
   }
 
   populateCollections() {
     axios
-      .get(`/api/users/${this.props._id}?populate=true&photoLimit=3`)
-      .then(res => this.setState({ 
+      .get(`/api/users/${this.props.match.params.id}?populate=true&photoLimit=3`)
+      .then(res => this.setState({
           user: res.data,
           collectionPreviews: res.data.collections
         }))
